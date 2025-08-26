@@ -5,13 +5,10 @@
     <meta charset="utf-8">
     <title>Cetak Laporan</title>
 
-    <!-- Normalize or reset CSS with your favorite library -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css">
 
-    <!-- Load paper.css for happy printing -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paper-css/0.4.1/paper.css">
 
-    <!-- Set page size here: A5, A4 or A3 -->
     <style>
         @page {
             size: A3;
@@ -59,12 +56,36 @@
     </style>
 </head>
 
-<body class="A3">
+<body>
+    {{-- Memindahkan fungsi ke sini, di luar perulangan. --}}
+    @php
+        use Carbon\Carbon;
+        function hitungTerlambat($jamMasuk, $jamIn) {
+            $masuk = Carbon::parse($jamMasuk);
+            $in = Carbon::parse($jamIn);
+            if ($in->greaterThan($masuk)) {
+                $diff = $in->diff($masuk);
+                $output = 'Terlambat ';
+                $parts = [];
+                if ($diff->h > 0) {
+                    $parts[] = $diff->h . ' jam';
+                }
+                if ($diff->i > 0) {
+                    $parts[] = $diff->i . ' menit';
+                }
+                if ($diff->s > 0) {
+                    $parts[] = $diff->s . ' detik';
+                }
+                return $output . implode(', ', $parts);
+            }
+            return 'Tepat Waktu';
+        }
+    @endphp
+
     <section class="sheet padding-10mm">
         <table style="width: 100%">
             <tr>
                 <td style="width: 30px">
-                    <!-- Mengganti nama file gambar logo -->
                     <img src="{{ asset('assets/img/logopresensi.png') }}" width="70" height="83" alt="">
                 </td>
                 <td>
@@ -113,7 +134,6 @@
                 <th>Status</th>
                 <th>Keterangan</th>
             </tr>
-
             @foreach ($presensi as $d)
                 <tr>
                     <td style="text-align: center">{{ $loop->iteration }}</td>
@@ -124,28 +144,6 @@
                     <td><img src="{{ $d->jam_out ? url(Storage::url('uploads/absensi/' . $d->foto_out)) : asset('assets/img/camera.jpg') }}" alt="" class="foto"></td>
                     <td style="text-align: center">{{ $d->status }}</td>
                     <td>
-                        @php
-                            function hitungTerlambat($jamMasuk, $jamIn) {
-                                $masuk = \Carbon\Carbon::parse($jamMasuk);
-                                $in = \Carbon\Carbon::parse($jamIn);
-                                if ($in->greaterThan($masuk)) {
-                                    $diff = $in->diff($masuk);
-                                    $output = 'Terlambat ';
-                                    $parts = [];
-                                    if ($diff->h > 0) {
-                                        $parts[] = $diff->h . ' jam';
-                                    }
-                                    if ($diff->i > 0) {
-                                        $parts[] = $diff->i . ' menit';
-                                    }
-                                    if ($diff->s > 0) {
-                                        $parts[] = $diff->s . ' detik';
-                                    }
-                                    return $output . implode(', ', $parts);
-                                }
-                                return 'Tepat Waktu';
-                            }
-                        @endphp
                         {{ hitungTerlambat($d->jam_masuk, $d->jam_in) }}
                     </td>
                 </tr>

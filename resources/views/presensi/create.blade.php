@@ -1,6 +1,5 @@
 @extends('layouts.presensi')
 @section('header')
-    <!-- App Header -->
     <div class="appHeader bg-primary text-light">
         <div class="left">
             <a href="javascript:;" class="headerButton goBack">
@@ -10,7 +9,6 @@
         <div class="pageTitle">E-Presensi</div>
         <div class="right"></div>
     </div>
-    <!-- * App Header -->
     <style>
         .webcam-capture,
         .webcam-capture video {
@@ -27,7 +25,6 @@
         }
 
         .jam-digital-malasngoding {
-
             background-color: #27272783;
             position: absolute;
             top: 65px;
@@ -36,9 +33,11 @@
             width: 150px;
             border-radius: 10px;
             padding: 5px;
+            
+            /* Menambahkan lebar dan tinggi untuk memperbesar kotak */
+            width: 250px;
+            height: auto;
         }
-
-
 
         .jam-digital-malasngoding p {
             color: #fff;
@@ -46,6 +45,12 @@
             text-align: left;
             margin-top: 0;
             margin-bottom: 0;
+        }
+        
+        /* Tambahan styling untuk teks keterangan jam */
+        .jam-keterangan {
+            font-size: 12px;
+            line-height: 1.4;
         }
     </style>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
@@ -61,11 +66,15 @@
     <div class="jam-digital-malasngoding">
         <p>{{ $hariini }}</p>
         <p id="jam"></p>
-        <p>{{ $jamkerja->nama_jam_kerja }}</p>
-        <p>Mulai : {{ date('H:i', strtotime($jamkerja->awal_jam_masuk)) }}</p>
-        <p>Masuk : {{ date('H:i', strtotime($jamkerja->jam_masuk)) }}</p>
-        <p>Akhir : {{ date('H:i', strtotime($jamkerja->akhir_jam_masuk)) }}</p>
-        <p>Pulang : {{ date('H:i', strtotime($jamkerja->jam_pulang)) }}</p>
+        
+        {{-- Menggabungkan semua keterangan jam menjadi satu baris --}}
+        <p class="jam-keterangan">
+            **{{ $jamkerja->nama_jam_kerja }}**<br>
+            Mulai: {{ date('H:i', strtotime($jamkerja->awal_jam_masuk)) }} | Masuk: {{ date('H:i', strtotime($jamkerja->jam_masuk)) }}<br>
+            Akhir Masuk: {{ date('H:i', strtotime($jamkerja->akhir_jam_masuk)) }}<br>
+            Pulang: {{ date('H:i', strtotime($jamkerja->jam_pulang)) }}<br>
+            Akhir Jam Pulang: {{ date('H:i', strtotime($jamkerja->akhir_jam_pulang)) }}
+        </p>
     </div>
     <div class="row">
         <div class="col">

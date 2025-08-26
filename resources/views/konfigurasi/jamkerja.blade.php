@@ -62,6 +62,7 @@
                                                 <th>Jam Masuk</th>
                                                 <th>Akhir Jam Masuk</th>
                                                 <th>Jam Pulang</th>
+                                                <th><strong>Akhir Jam Pulang</strong></th>
                                                 <th>Total Jam</th>
                                                 <th>Lintas Hari</th>
                                                 <th>Istirahat</th>
@@ -79,8 +80,8 @@
                                                     <td>{{ $d->awal_jam_masuk }}</td>
                                                     <td>{{ $d->jam_masuk }}</td>
                                                     <td>{{ $d->akhir_jam_masuk }}</td>
-
                                                     <td>{{ $d->jam_pulang }}</td>
+                                                    <td>{{ $d->akhir_jam_pulang ?? '-' }}</td>
                                                     <td class="text-center">{{ $d->total_jam }}</td>
                                                     <td>
                                                         @if ($d->lintashari == 1)
@@ -322,7 +323,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-12">
                                 <div class="input-icon mb-3">
@@ -344,6 +344,28 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Akhir Jam Pulang dipindah ke sini setelah Jam Pulang -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="input-icon mb-3">
+                                    <span class="input-icon-addon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-alarm"
+                                            width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                                            stroke="currentColor" fill="none" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                            <path d="M12 13m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path>
+                                            <path d="M12 10l0 3l2 0"></path>
+                                            <path d="M7 4l-2.75 2"></path>
+                                            <path d="M17 4l2.75 2"></path>
+                                        </svg>
+                                    </span>
+                                    <input type="text" value="" id="akhir_jam_pulang" class="form-control"
+                                        placeholder="Akhir Jam Pulang" name="akhir_jam_pulang">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Akhir Jam Pulang -->
                         <div class="row">
                             <div class="col-12">
                                 <div class="input-icon mb-3">
@@ -471,6 +493,7 @@
     </div>
 @endsection
 
+
 @push('myscript')
     <script>
         $(function() {
@@ -489,7 +512,8 @@
             });
             showsetjamistirahat();
 
-            $("#awal_jam_masuk, #jam_masuk, #akhir_jam_masuk, #jam_pulang,#awal_jam_istirahat,#akhir_jam_istirahat")
+            // Tambahkan mask untuk akhir_jam_pulang
+            $("#awal_jam_masuk, #jam_masuk, #akhir_jam_masuk, #jam_pulang, #akhir_jam_pulang, #awal_jam_istirahat, #akhir_jam_istirahat")
                 .mask("00:00");
 
             $("#btnTambahJK").click(function() {
@@ -523,6 +547,7 @@
                 var awal_jam_masuk = $("#awal_jam_masuk").val();
                 var jam_masuk = $("#jam_masuk").val();
                 var akhir_jam_masuk = $("#akhir_jam_masuk").val();
+                var akhir_jam_pulang = $("#akhir_jam_pulang").val(); // ambil nilai akhir jam pulang
                 var awal_jam_istirahat = $("#awal_jam_istirahat").val();
                 var akhir_jam_istirahat = $("#akhir_jam_istirahat").val();
                 var jam_pulang = $("#jam_pulang").val();
@@ -530,7 +555,6 @@
                 var lintashari = $("#lintashari").val();
                 var status_istirahat = $("#status_istirahat").val();
                 if (kode_jam_kerja == "") {
-                    // alert('Nik Harus Diisi');
                     Swal.fire({
                         title: 'Warning!',
                         text: 'Kode Jam Kerja Harus Diisi !',
@@ -542,7 +566,6 @@
 
                     return false;
                 } else if (nama_jam_kerja == "") {
-                    // alert('Nik Harus Diisi');
                     Swal.fire({
                         title: 'Warning!',
                         text: 'Nama Jam Kerja Harus Diisi !',
@@ -554,7 +577,6 @@
 
                     return false;
                 } else if (awal_jam_masuk == "") {
-                    // alert('Nik Harus Diisi');
                     Swal.fire({
                         title: 'Warning!',
                         text: 'Awal Jam Masuk Harus Diisi !',
@@ -566,7 +588,6 @@
 
                     return false;
                 } else if (jam_masuk == "") {
-                    // alert('Nik Harus Diisi');
                     Swal.fire({
                         title: 'Warning!',
                         text: 'Jam Masuk Harus Diisi !',
@@ -578,7 +599,6 @@
 
                     return false;
                 } else if (akhir_jam_masuk == "") {
-                    // alert('Nik Harus Diisi');
                     Swal.fire({
                         title: 'Warning!',
                         text: 'Akhir Masuk Harus Diisi !',
@@ -590,7 +610,6 @@
 
                     return false;
                 } else if (status_istirahat === "") {
-
                     Swal.fire({
                         title: 'Warning!',
                         text: 'Status Istirahat Harus Diisi !',
@@ -602,7 +621,6 @@
 
                     return false;
                 } else if (awal_jam_istirahat == "" && status_istirahat == "1") {
-
                     Swal.fire({
                         title: 'Warning!',
                         text: 'Jam Awal Istirahat Harus Diisi !',
@@ -614,7 +632,6 @@
 
                     return false;
                 } else if (akhir_jam_istirahat == "" && status_istirahat == "1") {
-                    // alert('Nik Harus Diisi');
                     Swal.fire({
                         title: 'Warning!',
                         text: 'Jam Akhir Istirahat Harus Diisi !',
@@ -626,7 +643,6 @@
 
                     return false;
                 } else if (jam_pulang == "") {
-                    // alert('Nik Harus Diisi');
                     Swal.fire({
                         title: 'Warning!',
                         text: 'Jam Pulang Harus Diisi !',
@@ -637,8 +653,18 @@
                     });
 
                     return false;
+                } else if (akhir_jam_pulang == "") {
+                    Swal.fire({
+                        title: 'Warning!',
+                        text: 'Akhir Jam Pulang Harus Diisi !',
+                        icon: 'warning',
+                        confirmButtonText: 'Ok'
+                    }).then((result) => {
+                        $("#akhir_jam_pulang").focus();
+                    });
+
+                    return false;
                 } else if (total_jam == "") {
-                    // alert('Nik Harus Diisi');
                     Swal.fire({
                         title: 'Warning!',
                         text: 'Total Jam Harus Diisi !',
@@ -650,7 +676,6 @@
 
                     return false;
                 } else if (lintashari == "") {
-                    // alert('Nik Harus Diisi');
                     Swal.fire({
                         title: 'Warning!',
                         text: 'Lintas Hari Harus Diisi !',
@@ -663,7 +688,6 @@
                     return false;
                 }
             });
-
 
             $(".edit").click(function() {
                 var kode_jam_kerja = $(this).attr('kode_jam_kerja');

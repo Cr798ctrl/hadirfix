@@ -118,11 +118,6 @@ class PresensiController extends Controller
             $jamkerja = DB::table('jam_kerja')->where('kode_jam_kerja', $kode_jam_kerja)->first();
         }
 
-
-
-
-
-
         if ($datapresensi != null && $datapresensi->status != "h") {
             return view('presensi.notifizin');
         } else if ($jamkerja == null) {
@@ -196,8 +191,6 @@ class PresensiController extends Controller
             $jamkerja = DB::table('jam_kerja')->where('kode_jam_kerja', $kode_jam_kerja)->first();
         }
 
-
-
         $presensi = DB::table('presensi')->where('tgl_presensi', $tgl_presensi)->where('nik', $nik);
         $cek = $presensi->count();
         $datapresensi = $presensi->first();
@@ -217,16 +210,23 @@ class PresensiController extends Controller
         $tgl_pulang = $jamkerja->lintashari == 1 ? date('Y-m-d', strtotime("+ 1 days", strtotime($tgl_presensi))) : $tgl_presensi;
         $jam_pulang = $hariini . " " . $jam;
         $jamkerja_pulang = $tgl_pulang . " " . $jamkerja->jam_pulang;
+        
+        // ➡️ MENAMBAHKAN LOGIKA AKHIR JAM PULANG
+        $akhir_jam_pulang = $jamkerja->lintashari == 1 ? date('Y-m-d', strtotime("+ 1 days", strtotime($tgl_presensi))) . " " . $jamkerja->akhir_jam_pulang : $tgl_presensi . " " . $jamkerja->akhir_jam_pulang;
+
         $datakaryawan = DB::table('karyawan')->where('nik', $nik)->first();
         $no_hp = $datakaryawan->no_hp;
         if ($status_location == 1 && $radius > $lok_kantor->radius_cabang) {
             echo "error|Maaf Anda Berada Diluar Radius, Jarak Anda " . $radius . " meter dari Kantor|radius";
         } else {
             if ($cek > 0) {
+                // Absen Pulang
                 if ($jam_pulang < $jamkerja_pulang) {
-                    echo "error|Maaf Belum Waktunya Pulang |out";
+                    echo "error|Maaf Belum Waktunya Pulang|out";
+                } else if ($jam > $jamkerja->akhir_jam_pulang) {
+                    echo "error|Maaf Waktu Untuk Presensi Pulang Sudah Habis|out";
                 } else if (!empty($datapresensi->jam_out)) {
-                    echo "error|Anda Sudah Melakukan Absen Pulang Sebelmnya ! |out";
+                    echo "error|Anda Sudah Melakukan Absen Pulang Sebelmnya !|out";
                 } else {
                     $data_pulang = [
                         'jam_out' => $jam,
@@ -237,9 +237,8 @@ class PresensiController extends Controller
                     if ($update) {
                         echo "success|Terimkasih, Hati Hati Di Jalan|out";
                         Storage::put($file, $image_base64);
-
+                        
                         $curl = curl_init();
-
                         curl_setopt_array($curl, array(
                             CURLOPT_URL => 'https://wagateway.pedasalami.com/send-message',
                             CURLOPT_RETURNTRANSFER => true,
@@ -251,16 +250,14 @@ class PresensiController extends Controller
                             CURLOPT_CUSTOMREQUEST => 'POST',
                             CURLOPT_POSTFIELDS => array('message' => 'Terimakasih Sudah Melakukan Absen Pulang, Anda Melakukan Absen Pada Jam ' . $jam, 'number' => $no_hp, 'file_dikirim' => ''),
                         ));
-
                         $response = curl_exec($curl);
-
                         curl_close($curl);
-                        //echo $response;
                     } else {
                         echo "error|Maaf Gagal absen, Hubungi Tim It|out";
                     }
                 }
             } else {
+                // Absen Masuk
                 if ($jam < $jamkerja->awal_jam_masuk) {
                     echo "error|Maaf Belum Waktunya Melakuan Presensi|in";
                 } else if ($jam > $jamkerja->akhir_jam_masuk) {
@@ -278,9 +275,9 @@ class PresensiController extends Controller
                     $simpan = DB::table('presensi')->insert($data);
                     if ($simpan) {
                         echo "success|Terimkasih, Selamat Bekerja|in";
-
+                        Storage::put($file, $image_base64);
+                        
                         $curl = curl_init();
-
                         curl_setopt_array($curl, array(
                             CURLOPT_URL => 'https://wagateway.pedasalami.com/send-message',
                             CURLOPT_RETURNTRANSFER => true,
@@ -292,12 +289,8 @@ class PresensiController extends Controller
                             CURLOPT_CUSTOMREQUEST => 'POST',
                             CURLOPT_POSTFIELDS => array('message' => 'Terimakasih Sudah Melakukan Absen Masuk, Anda Melakukan Absen Pada Jam ' . $jam, 'number' => $no_hp, 'file_dikirim' => ''),
                         ));
-
                         $response = curl_exec($curl);
-
                         curl_close($curl);
-                        //echo $response;
-                        Storage::put($file, $image_base64);
                     } else {
                         echo "error|Maaf Gagal absen, Hubungi Tim It|in";
                     }

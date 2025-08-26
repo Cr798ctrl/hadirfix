@@ -40,41 +40,46 @@ class KonfigurasiController extends Controller
     }
 
     public function storejamkerja(Request $request)
-    {
-        $kode_jam_kerja = $request->kode_jam_kerja;
-        $nama_jam_kerja = $request->nama_jam_kerja;
-        $awal_jam_masuk = $request->awal_jam_masuk;
-        $jam_masuk = $request->jam_masuk;
-        $akhir_jam_masuk = $request->akhir_jam_masuk;
-        $status_istirahat = $request->status_istirahat;
-        $awal_jam_istirahat = $request->awal_jam_istirahat;
-        $akhir_jam_istirahat = $request->akhir_jam_istirahat;
-        $jam_pulang = $request->jam_pulang;
-        $total_jam = $request->total_jam;
-        $lintashari = $request->lintashari;
+{
+    $kode_jam_kerja = $request->kode_jam_kerja;
+    $nama_jam_kerja = $request->nama_jam_kerja;
+    $awal_jam_masuk = $request->awal_jam_masuk;
+    $jam_masuk = $request->jam_masuk;
+    $akhir_jam_masuk = $request->akhir_jam_masuk;
+    $status_istirahat = $request->status_istirahat;
+    $awal_jam_istirahat = $request->awal_jam_istirahat;
+    $akhir_jam_istirahat = $request->akhir_jam_istirahat;
+    $jam_pulang = $request->jam_pulang;
+    $total_jam = $request->total_jam;
+    $lintashari = $request->lintashari;
 
-        //dd($lintashari);
-        $data = [
-            'kode_jam_kerja' => $kode_jam_kerja,
-            'nama_jam_kerja' => $nama_jam_kerja,
-            'awal_jam_masuk' => $awal_jam_masuk,
-            'jam_masuk' => $jam_masuk,
-            'akhir_jam_masuk' => $akhir_jam_masuk,
-            'status_istirahat' => $status_istirahat,
-            'awal_jam_istirahat' => $awal_jam_istirahat,
-            'akhir_jam_istirahat' => $akhir_jam_istirahat,
-            'jam_pulang' => $jam_pulang,
-            'total_jam' => $total_jam,
-            'lintashari' => $lintashari
-        ];
-        try {
-            DB::table('jam_kerja')->insert($data);
-            return Redirect::back()->with(['success' => 'Data Berhasil Disimpan']);
-        } catch (\Exception $e) {
-            dd($e);
-            return Redirect::back()->with(['warning' => 'Data Gagal Disimpan']);
-        }
+    // ➡️ TAMBAHKAN BARIS INI UNTUK MENGAMBIL NILAI AKHIR JAM PULANG
+    $akhir_jam_pulang = $request->akhir_jam_pulang;
+
+    $data = [
+        'kode_jam_kerja' => $kode_jam_kerja,
+        'nama_jam_kerja' => $nama_jam_kerja,
+        'awal_jam_masuk' => $awal_jam_masuk,
+        'jam_masuk' => $jam_masuk,
+        'akhir_jam_masuk' => $akhir_jam_masuk,
+        'status_istirahat' => $status_istirahat,
+        'awal_jam_istirahat' => $awal_jam_istirahat,
+        'akhir_jam_istirahat' => $akhir_jam_istirahat,
+        'jam_pulang' => $jam_pulang,
+        'total_jam' => $total_jam,
+        'lintashari' => $lintashari,
+        // ➡️ TAMBAHKAN BARIS INI KE DALAM ARRAY DATA
+        'akhir_jam_pulang' => $akhir_jam_pulang
+    ];
+    try {
+        DB::table('jam_kerja')->insert($data);
+        return Redirect::back()->with(['success' => 'Data Berhasil Disimpan']);
+    } catch (\Exception $e) {
+        // Hapus atau komentari baris di bawah ini setelah perbaikan
+        dd($e);
+        return Redirect::back()->with(['warning' => 'Data Gagal Disimpan']);
     }
+}
 
 
     public function editjamkerja(Request $request)
@@ -85,38 +90,44 @@ class KonfigurasiController extends Controller
     }
 
     public function updatejamkerja(Request $request)
-    {
-        $kode_jam_kerja = $request->kode_jam_kerja;
-        $nama_jam_kerja = $request->nama_jam_kerja;
-        $awal_jam_masuk = $request->awal_jam_masuk;
-        $jam_masuk = $request->jam_masuk;
-        $akhir_jam_masuk = $request->akhir_jam_masuk;
-        $jam_pulang = $request->jam_pulang;
-        $total_jam = $request->total_jam;
-        $lintashari = $request->lintashari;
-        $status_istirahat = $request->status_istirahat;
-        $awal_jam_istirahat = $request->awal_jam_istirahat;
-        $akhir_jam_istirahat = $request->akhir_jam_istirahat;
-        $data = [
-            'nama_jam_kerja' => $nama_jam_kerja,
-            'awal_jam_masuk' => $awal_jam_masuk,
-            'jam_masuk' => $jam_masuk,
-            'akhir_jam_masuk' => $akhir_jam_masuk,
-            'status_istirahat' => $status_istirahat,
-            'awal_jam_istirahat' => $awal_jam_istirahat,
-            'akhir_jam_istirahat' => $akhir_jam_istirahat,
-            'jam_pulang' => $jam_pulang,
-            'total_jam' => $total_jam,
-            'lintashari' => $lintashari
-        ];
-        try {
-            DB::table('jam_kerja')->where('kode_jam_kerja', $kode_jam_kerja)->update($data);
-            return Redirect::back()->with(['success' => 'Data Berhasil Diupdate']);
-        } catch (\Exception $e) {
-            dd($e);
-            return Redirect::back()->with(['warning' => 'Data Gagal Diupdate']);
-        }
+{
+    $kode_jam_kerja = $request->kode_jam_kerja;
+    $nama_jam_kerja = $request->nama_jam_kerja;
+    $awal_jam_masuk = $request->awal_jam_masuk;
+    $jam_masuk = $request->jam_masuk;
+    $akhir_jam_masuk = $request->akhir_jam_masuk;
+    $jam_pulang = $request->jam_pulang;
+    $total_jam = $request->total_jam;
+    $lintashari = $request->lintashari;
+    $status_istirahat = $request->status_istirahat;
+    $awal_jam_istirahat = $request->awal_jam_istirahat;
+    $akhir_jam_istirahat = $request->akhir_jam_istirahat;
+    
+    // ➡️ TAMBAHKAN BARIS INI
+    $akhir_jam_pulang = $request->akhir_jam_pulang;
+
+    $data = [
+        'nama_jam_kerja' => $nama_jam_kerja,
+        'awal_jam_masuk' => $awal_jam_masuk,
+        'jam_masuk' => $jam_masuk,
+        'akhir_jam_masuk' => $akhir_jam_masuk,
+        'status_istirahat' => $status_istirahat,
+        'awal_jam_istirahat' => $awal_jam_istirahat,
+        'akhir_jam_istirahat' => $akhir_jam_istirahat,
+        'jam_pulang' => $jam_pulang,
+        'total_jam' => $total_jam,
+        'lintashari' => $lintashari,
+        // ➡️ TAMBAHKAN BARIS INI
+        'akhir_jam_pulang' => $akhir_jam_pulang
+    ];
+    try {
+        DB::table('jam_kerja')->where('kode_jam_kerja', $kode_jam_kerja)->update($data);
+        return Redirect::back()->with(['success' => 'Data Berhasil Diupdate']);
+    } catch (\Exception $e) {
+        dd($e);
+        return Redirect::back()->with(['warning' => 'Data Gagal Diupdate']);
     }
+}
 
     public function deletejamkerja($kode_jam_kerja)
     {
