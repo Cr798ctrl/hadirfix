@@ -91,9 +91,9 @@
                     <span id="title">
                         LAPORAN PRESENSI KARYAWAN<br>
                         PERIODE {{ strtoupper($namabulan[$bulan]) }} {{ $tahun }}<br>
-                      SMK NEGERI 4 LANGSA<br>
+                      NAMA SEKOLAH<br>
                     </span>
-                    <span><i>Jl. Istiqamah, No. 12, Alue Dua, Langsa Baro, 24415, Alue Dua, Kec. Langsa Baro, Kota Langsa, Aceh 24452</i></span>
+                    <span><i>Alamat Sekolah</i></span>
                 </td>
             </tr>
         </table>
@@ -187,23 +187,7 @@
                     </tr>
                 @endif
             @endforeach
-        </table>
-
-        <table width="100%" style="margin-top:100px">
-            <tr>
-                <td colspan="2" style="text-align: right">Tasikmalaya, {{ date('d-m-Y') }}</td>
-            </tr>
-            <tr>
-                <td style="text-align: center; vertical-align:bottom" height="100px">
-                    <u>Qiana Aqila</u><br>
-                    <i><b>HRD Manager</b></i>
-                </td>
-                <td style="text-align: center; vertical-align:bottom">
-                    <u>Daffa</u><br>
-                    <i><b>Direktur</b></i>
-                </td>
-            </tr>
-        </table>
+        </table>      
     </section>
 
 </body>

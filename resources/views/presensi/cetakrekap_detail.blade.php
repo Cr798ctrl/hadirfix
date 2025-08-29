@@ -79,9 +79,9 @@ return false;
                     <span id="title">
                         REKAP PRESENSI PEGAWAI<br>
                         PERIODE {{ strtoupper($namabulan[$bulan]) }} {{ $tahun }}<br>
-                        SMK NEGERI 4 LANGSA<br>
+                        NAMA SEKOLAH<br>
                     </span>
-                    <span><i>Jl. Istiqamah, No. 12, Alue Dua, Langsa Baro, 24415, Alue Dua, Kec. Langsa Baro, Kota Langsa, Aceh 24452</i></span>
+                    <span><i>Alamat Sekolah</i></span>
                 </td>
             </tr>
         </table>
@@ -250,7 +250,7 @@ return false;
  <tr>
 <td></td>
 <td style="text-align: center">Langsa, {{ formatTanggalIndonesia(date('Y-m-d')) }}<br> <!-- Format date to dd mmmm yyyy -->
-Kepala SMKN 2 Langsa</td>
+Kepala Sekolah</td>
 </tr>
 <tr>
 <td style="text-align: left; vertical-align:bottom" height="100px">
@@ -258,8 +258,8 @@ Kepala SMKN 2 Langsa</td>
 
 </td>
 <td style="text-align: center; vertical-align:bottom">
-<b>Rusli, S.Pd</b><br>
-NIP. 196710281989011001
+<b>Nama Kepsek</b><br>
+NIP. Kepsek
 </td>
 </tr>
 </table>

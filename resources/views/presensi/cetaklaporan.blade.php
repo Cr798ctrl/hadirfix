@@ -92,9 +92,9 @@
                     <span id="title">
                         LAPORAN PRESENSI PEGAWAI<br>
                         PERIODE {{ strtoupper($namabulan[$bulan]) }} {{ $tahun }}<br>
-                        SMK NEGERI 4 LANGSA<br>
+                        NAMA SEKOLAH<br>
                     </span>
-                    <span><i>Jl. Istiqamah, No. 12, Alue Dua, Langsa Baro, 24415, Alue Dua, Kec. Langsa Baro, Kota Langsa, Aceh 24452</i></span>
+                    <span><i>Alamat Sekolah</i></span>
                 </td>
             </tr>
         </table>
@@ -157,8 +157,8 @@
                 <td colspan="2" style="text-align: left">
                     Mengetahui,<br>
                     Kepala Sekolah<br><br><br><br>
-                    <u>Rusli, S.Pd.</u><br>
-                    NIP. 196710281989011001
+                    <u>Nama Kepsek</u><br>
+                    NIP. Kepsek
                 </td>
                 <td></td>
                 <td></td>
