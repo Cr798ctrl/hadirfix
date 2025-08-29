@@ -18,7 +18,7 @@
         .page-center {
             background-color: #f8fafc; /* Latar belakang abu-abu muda */
         }
-        .login-card {
+        .login-card {b
             border: none;
             box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.08); /* Shadow yang lebih lembut */
             border-radius: 1.5rem; /* Sudut lebih melengkung */
@@ -41,7 +41,7 @@
         <div class="container container-normal py-4">
             <div class="row align-items-center g-4">
                 <div class="col-lg d-none d-lg-block">
-                    <img src="{{ asset('tabler/static/illustrations/undraw_secure_login_pdn4.svg') }}" height="300" class="d-block mx-auto" alt="Login Illustration">
+                    <img src="{{ asset('assets/img/logopresensi.png') }}" height="300" class="d-block mx-auto" alt="Login Illustration">
                 </div>
                 <div class="col-lg">
                     <div class="container-tight">

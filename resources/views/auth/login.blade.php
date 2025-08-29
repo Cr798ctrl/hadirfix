@@ -8,8 +8,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#004AAD">
     <title>E-Presensi | Login</title>
-    <link rel="icon" type="image/png" href="{{ asset('icon-512.png') }}" sizes="32x32">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('icon-512.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('assets/img/logopresensi.png') }}" sizes="32x32">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/img/logopresensi.png') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <link rel="manifest" href="{{ asset('manifest.json') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,7 +28,7 @@
 
         <div class="login-card shadow-lg p-5 bg-light rounded-3 w-100" style="max-width: 400px;">
             <div class="text-center mb-4">
-                <img src="{{ asset('assets/img/login/login.webp') }}" alt="logo" class="mb-3" style="width: 180px; height: auto;">
+                <img src="{{ asset('assets/img/logopresensi.png') }}" alt="logo" class="mb-3" style="width: 180px; height: auto;">
                 <h1 class="h2 fw-bold text-primary">E-Presensi</h1>
                 <p class="text-muted mt-2">Silakan Login untuk melanjutkan</p>
             </div>
