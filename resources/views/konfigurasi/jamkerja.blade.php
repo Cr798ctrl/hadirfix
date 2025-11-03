@@ -4,6 +4,11 @@
         <div class="container-xl">
             <div class="row g-2 align-items-center">
                 <div class="col">
+<<<<<<< HEAD
+=======
+                    <!-- Page pre-title -->
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                     <h2 class="page-title">
                         Konfigurasi Jam Kerja
                     </h2>
@@ -53,6 +58,7 @@
                                     <table class="table table-bordered">
                                         <thead>
                                             <tr>
+<<<<<<< HEAD
                                                 <th class="text-nowrap">No</th>
                                                 <th class="text-nowrap">Kode JK</th>
                                                 <th class="text-nowrap">Nama JK</th>
@@ -61,6 +67,22 @@
                                                 <th class="text-nowrap">Akhir Masuk</th>
                                                 <th class="text-nowrap">Jam Pulang</th>
                                                 <th class="text-nowrap">Akhir Pulang</th> <th class="text-nowrap">Total</th> <th class="text-nowrap text-center">LH</th> <th class="text-nowrap text-center">Ist.</th> <th class="text-nowrap">Awal Ist.</th> <th class="text-nowrap">Akhir Ist.</th> <th class="text-nowrap">Aksi</th>
+=======
+                                                <th>No</th>
+                                                <th>Kode JK</th>
+                                                <th>Nama JK</th>
+                                                <th>Awal Jam Masuk</th>
+                                                <th>Jam Masuk</th>
+                                                <th>Akhir Jam Masuk</th>
+                                                <th>Jam Pulang</th>
+                                                <th><strong>Akhir Jam Pulang</strong></th>
+                                                <th>Total Jam</th>
+                                                <th>Lintas Hari</th>
+                                                <th>Istirahat</th>
+                                                <th>Awal Istirahat</th>
+                                                <th>Akhir Istirahat</th>
+                                                <th>Aksi</th>
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -69,6 +91,7 @@
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $d->kode_jam_kerja }}</td>
                                                     <td>{{ $d->nama_jam_kerja }}</td>
+<<<<<<< HEAD
                                                     <td class="text-nowrap">{{ $d->awal_jam_masuk }}</td>
                                                     <td class="text-nowrap">{{ $d->jam_masuk }}</td>
                                                     <td class="text-nowrap">{{ $d->akhir_jam_masuk }}</td>
@@ -76,6 +99,16 @@
                                                     <td class="text-nowrap">{{ $d->akhir_jam_pulang ?? '-' }}</td>
                                                     <td class="text-center">{{ $d->total_jam }}</td>
                                                     <td class="text-center"> @if ($d->lintashari == 1)
+=======
+                                                    <td>{{ $d->awal_jam_masuk }}</td>
+                                                    <td>{{ $d->jam_masuk }}</td>
+                                                    <td>{{ $d->akhir_jam_masuk }}</td>
+                                                    <td>{{ $d->jam_pulang }}</td>
+                                                    <td>{{ $d->akhir_jam_pulang ?? '-' }}</td>
+                                                    <td class="text-center">{{ $d->total_jam }}</td>
+                                                    <td>
+                                                        @if ($d->lintashari == 1)
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                                                             <span class="badge bg-success">
                                                                 <svg xmlns="http://www.w3.org/2000/svg"
                                                                     class="icon icon-tabler icon-tabler-square-check-filled"
@@ -103,7 +136,12 @@
                                                             </span>
                                                         @endif
                                                     </td>
+<<<<<<< HEAD
                                                     <td class="text-center"> @if ($d->status_istirahat == 1)
+=======
+                                                    <td>
+                                                        @if ($d->status_istirahat == 1)
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                                                             <span class="badge bg-success">
                                                                 <svg xmlns="http://www.w3.org/2000/svg"
                                                                     class="icon icon-tabler icon-tabler-square-check-filled"
@@ -131,9 +169,15 @@
                                                             </span>
                                                         @endif
                                                     </td>
+<<<<<<< HEAD
                                                     <td class="text-nowrap">{{ $d->awal_jam_istirahat }}</td>
                                                     <td class="text-nowrap">{{ $d->akhir_jam_istirahat }}</td>
                                                     <td class="text-nowrap">
+=======
+                                                    <td>{{ $d->awal_jam_istirahat }}</td>
+                                                    <td>{{ $d->akhir_jam_istirahat }}</td>
+                                                    <td>
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                                                         <div class="btn-group">
                                                             <a href="#" class="edit btn btn-info btn-sm"
                                                                 kode_jam_kerja="{{ $d->kode_jam_kerja }}">
@@ -204,6 +248,10 @@
                             <div class="col-12">
                                 <div class="input-icon mb-3">
                                     <span class="input-icon-addon">
+<<<<<<< HEAD
+=======
+                                        <!-- Download SVG icon from http://tabler-icons.io/i/user -->
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                                         <svg xmlns="http://www.w3.org/2000/svg"
                                             class="icon icon-tabler icon-tabler-barcode" width="24" height="24"
                                             viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
@@ -228,6 +276,10 @@
                             <div class="col-12">
                                 <div class="input-icon mb-3">
                                     <span class="input-icon-addon">
+<<<<<<< HEAD
+=======
+                                        <!-- Download SVG icon from http://tabler-icons.io/i/user -->
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                                         <svg xmlns="http://www.w3.org/2000/svg"
                                             class="icon icon-tabler icon-tabler-barcode" width="24" height="24"
                                             viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
@@ -252,6 +304,10 @@
                             <div class="col-12">
                                 <div class="input-icon mb-3">
                                     <span class="input-icon-addon">
+<<<<<<< HEAD
+=======
+                                        <!-- Download SVG icon from http://tabler-icons.io/i/user -->
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-alarm"
                                             width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
                                             stroke="currentColor" fill="none" stroke-linecap="round"
@@ -272,6 +328,10 @@
                             <div class="col-12">
                                 <div class="input-icon mb-3">
                                     <span class="input-icon-addon">
+<<<<<<< HEAD
+=======
+                                        <!-- Download SVG icon from http://tabler-icons.io/i/user -->
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-alarm"
                                             width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
                                             stroke="currentColor" fill="none" stroke-linecap="round"
@@ -292,6 +352,10 @@
                             <div class="col-12">
                                 <div class="input-icon mb-3">
                                     <span class="input-icon-addon">
+<<<<<<< HEAD
+=======
+                                        <!-- Download SVG icon from http://tabler-icons.io/i/user -->
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-alarm"
                                             width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
                                             stroke="currentColor" fill="none" stroke-linecap="round"
@@ -312,6 +376,10 @@
                             <div class="col-12">
                                 <div class="input-icon mb-3">
                                     <span class="input-icon-addon">
+<<<<<<< HEAD
+=======
+                                        <!-- Download SVG icon from http://tabler-icons.io/i/user -->
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-alarm"
                                             width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
                                             stroke="currentColor" fill="none" stroke-linecap="round"
@@ -328,6 +396,10 @@
                                 </div>
                             </div>
                         </div>
+<<<<<<< HEAD
+=======
+                        <!-- Akhir Jam Pulang dipindah ke sini setelah Jam Pulang -->
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                         <div class="row">
                             <div class="col-12">
                                 <div class="input-icon mb-3">
@@ -348,10 +420,18 @@
                                 </div>
                             </div>
                         </div>
+<<<<<<< HEAD
+=======
+                        <!-- End Akhir Jam Pulang -->
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                         <div class="row">
                             <div class="col-12">
                                 <div class="input-icon mb-3">
                                     <span class="input-icon-addon">
+<<<<<<< HEAD
+=======
+                                        <!-- Download SVG icon from http://tabler-icons.io/i/user -->
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-alarm"
                                             width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
                                             stroke="currentColor" fill="none" stroke-linecap="round"
@@ -383,6 +463,10 @@
                             <div class="col-12">
                                 <div class="input-icon mb-3">
                                     <span class="input-icon-addon">
+<<<<<<< HEAD
+=======
+                                        <!-- Download SVG icon from http://tabler-icons.io/i/user -->
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-alarm"
                                             width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
                                             stroke="currentColor" fill="none" stroke-linecap="round"
@@ -403,6 +487,10 @@
                             <div class="col-12">
                                 <div class="input-icon mb-3">
                                     <span class="input-icon-addon">
+<<<<<<< HEAD
+=======
+                                        <!-- Download SVG icon from http://tabler-icons.io/i/user -->
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-alarm"
                                             width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
                                             stroke="currentColor" fill="none" stroke-linecap="round"
@@ -686,4 +774,8 @@
             });
         });
     </script>
+<<<<<<< HEAD
 @endpush
+=======
+@endpush
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759

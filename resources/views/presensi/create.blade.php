@@ -69,11 +69,18 @@
         
         {{-- Menggabungkan semua keterangan jam menjadi satu baris --}}
         <p class="jam-keterangan">
+<<<<<<< HEAD
             {{ $jamkerja->nama_jam_kerja }}<br>
             Mulai Jam Masuk: {{ date('H:i', strtotime($jamkerja->awal_jam_masuk)) }} <br> 
             Jam Masuk: {{ date('H:i', strtotime($jamkerja->jam_masuk)) }}<br>
             Akhir Jam Masuk: {{ date('H:i', strtotime($jamkerja->akhir_jam_masuk)) }}<br>
             Mulai Jam Pulang: {{ date('H:i', strtotime($jamkerja->jam_pulang)) }}<br>
+=======
+            **{{ $jamkerja->nama_jam_kerja }}**<br>
+            Mulai: {{ date('H:i', strtotime($jamkerja->awal_jam_masuk)) }} | Masuk: {{ date('H:i', strtotime($jamkerja->jam_masuk)) }}<br>
+            Akhir Masuk: {{ date('H:i', strtotime($jamkerja->akhir_jam_masuk)) }}<br>
+            Pulang: {{ date('H:i', strtotime($jamkerja->jam_pulang)) }}<br>
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
             Akhir Jam Pulang: {{ date('H:i', strtotime($jamkerja->akhir_jam_pulang)) }}
         </p>
     </div>

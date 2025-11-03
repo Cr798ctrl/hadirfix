@@ -29,6 +29,7 @@
                     <option value="a"
                         @if ($presensi != null) @if ($presensi->status === 'a')
                         selected @endif
+<<<<<<< HEAD
                         @endif>Alpa</option>
                     <option value="i"
                         @if ($presensi != null) @if ($presensi->status === 'i')
@@ -38,6 +39,9 @@
                         @if ($presensi != null) @if ($presensi->status === 's')
                         selected @endif
                         @endif>Sakit</option>
+=======
+                        @endif>Alfa</option>
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                 </select>
             </div>
         </div>

@@ -57,6 +57,10 @@ class PresensiController extends Controller
         return $hari_ini;
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
     public function create($kode_jam_kerja)
     {
 
@@ -80,6 +84,10 @@ class PresensiController extends Controller
         }
         $namahari = $this->gethari(date('D', strtotime($hariini)));
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
         $kode_dept = Auth::guard('karyawan')->user()->kode_dept;
         $presensi = DB::table('presensi')->where('tgl_presensi', $hariini)->where('nik', $nik);
         $cek = $presensi->count();
@@ -361,6 +369,10 @@ class PresensiController extends Controller
         }
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
     public function histori()
     {
         $namabulan = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -384,6 +396,10 @@ class PresensiController extends Controller
             ->orderBy('tgl_presensi')
             ->get();
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
         return view('presensi.gethistori', compact('histori'));
     }
 
@@ -511,6 +527,10 @@ class PresensiController extends Controller
         //         ->get();
         // }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
         return view('presensi.getpresensi', compact('presensi', 'tanggal'));
     }
 
@@ -523,6 +543,10 @@ class PresensiController extends Controller
         return view('presensi.showmap', compact('presensi'));
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
     public function laporan()
     {
         $kode_dept = Auth::guard('user')->user()->kode_dept;
@@ -544,6 +568,7 @@ class PresensiController extends Controller
     }
 
     public function cetaklaporan(Request $request)
+<<<<<<< HEAD
 {
     $nik = $request->nik;
     $bulan = $request->bulan;
@@ -583,6 +608,40 @@ class PresensiController extends Controller
     // 💡 TAMBAHKAN 'harilibur' ke dalam compact
     return view('presensi.cetaklaporan', compact('bulan', 'tahun', 'namabulan', 'karyawan', 'presensi', 'harilibur'));
 }
+=======
+    {
+
+
+
+        $nik = $request->nik;
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+        $namabulan = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        $karyawan = DB::table('karyawan')->where('nik', $nik)
+            ->join('departemen', 'karyawan.kode_dept', '=', 'departemen.kode_dept')
+            ->first();
+
+        $presensi = DB::table('presensi')
+            ->select('presensi.*', 'keterangan', 'jam_kerja.*')
+            ->leftJoin('jam_kerja', 'presensi.kode_jam_kerja', '=', 'jam_kerja.kode_jam_kerja')
+            ->leftJoin('pengajuan_izin', 'presensi.kode_izin', '=', 'pengajuan_izin.kode_izin')
+            ->where('presensi.nik', $nik)
+            ->whereRaw('MONTH(tgl_presensi)="' . $bulan . '"')
+            ->whereRaw('YEAR(tgl_presensi)="' . $tahun . '"')
+            ->orderBy('tgl_presensi')
+            ->get();
+
+        if (isset($_POST['exportexcel'])) {
+            $time = date("d-M-Y H:i:s");
+            // Fungsi header dengan mengirimkan raw data excel
+            header("Content-type: application/vnd-ms-excel");
+            // Mendefinisikan nama file ekspor "hasil-export.xls"
+            header("Content-Disposition: attachment; filename=Laporan Presensi Karyawan $time.xls");
+            return view('presensi.cetaklaporanexcel', compact('bulan', 'tahun', 'namabulan', 'karyawan', 'presensi'));
+        }
+        return view('presensi.cetaklaporan', compact('bulan', 'tahun', 'namabulan', 'karyawan', 'presensi'));
+    }
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
 
     public function rekap()
     {
@@ -658,6 +717,10 @@ class PresensiController extends Controller
             array_push($rangetanggal, NULL, NULL, NULL);
         }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
         $query = Karyawan::query();
         $query->selectRaw(
             "$field_date karyawan.nik, nama_lengkap, jabatan"
@@ -686,9 +749,17 @@ class PresensiController extends Controller
             $query->where('kode_cabang', $kode_cabang);
         }
 
+<<<<<<< HEAD
         $query->orderBy('nama_lengkap');
         $rekap = $query->get();
 
+=======
+
+        $query->orderBy('nama_lengkap');
+        $rekap = $query->get();
+
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
         //dd($rekap);
         if (isset($_POST['exportexcel'])) {
             $time = date("d-M-Y H:i:s");
@@ -792,6 +863,10 @@ class PresensiController extends Controller
                 }
             }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
             DB::table('pengajuan_izin')->where('kode_izin', $kode_izin)->update([
                 'status_approved' => $status_approved
             ]);
@@ -803,6 +878,10 @@ class PresensiController extends Controller
             return Redirect::back()->with(['warning' => 'Data Gagal Diproses']);
         }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
         // $update = DB::table('pengajuan_izin')->where('id', $kode_izin)->update([
         //     'status_approved' => $status_approved
         // ]);
@@ -816,6 +895,10 @@ class PresensiController extends Controller
     public function batalkanizinsakit($kode_izin)
     {
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
         DB::beginTransaction();
         try {
             DB::table('pengajuan_izin')->where('kode_izin', $kode_izin)->update([
@@ -848,6 +931,10 @@ class PresensiController extends Controller
         return $cek;
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
     public function storefrommachine()
     {
         $original_data  = file_get_contents('php://input');
@@ -898,6 +985,10 @@ class PresensiController extends Controller
         return view('presensi.koreksipresensi', compact('karyawan', 'tanggal', 'jamkerja', 'presensi'));
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
     public function storekoreksipresensi(Request $request)
     {
         $status = $request->status;
@@ -931,6 +1022,10 @@ class PresensiController extends Controller
                 ]);
             }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
             return Redirect::back()->with(['success' => 'Data Berhasil Disimpan']);
         } catch (\Exception $e) {
             dd($e);
@@ -970,6 +1065,10 @@ class PresensiController extends Controller
 
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
     // public function scanqr()
     // {
     //     $hariini = date("Y-m-d");
@@ -994,6 +1093,10 @@ class PresensiController extends Controller
     //     return view('presensi.scanqr', compact('cek', 'lok_kantor', 'jamkerja'));
     // }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
     // public function storeqr(Request $request)
     // {
 
@@ -1032,6 +1135,10 @@ class PresensiController extends Controller
 
     //     $cek = DB::table('presensi')->where('tgl_presensi', $tgl_presensi)->where('nik', $nik)->count();
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
     //     // echo $cek;
     //     // die;
     //     if ($cek > 0) {
@@ -1105,5 +1212,8 @@ class PresensiController extends Controller
     //     }
     // }
 }
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759

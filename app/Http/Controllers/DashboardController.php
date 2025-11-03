@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+<<<<<<< HEAD
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -28,6 +29,21 @@ class DashboardController extends Controller
         $presensihariini = DB::table('presensi')->where('nik', $nik)->where('tgl_presensi', $hariini)->first();
         
         // Mengambil histori presensi bulan ini
+=======
+
+class DashboardController extends Controller
+{
+    public function index()
+    {
+        $hariini = date("Y-m-d");
+        $bulanini = date("m") * 1; //1 atau Januari
+        $tahunini = date("Y"); // 2023
+        $nik = Auth::guard('karyawan')->user()->nik;
+        $kode_cabang = Auth::guard('karyawan')->user()->kode_cabang;
+
+        $kode_dept = Auth::guard('karyawan')->user()->kode_dept;
+        $presensihariini = DB::table('presensi')->where('nik', $nik)->where('tgl_presensi', $hariini)->first();
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
         $historibulanini = DB::table('presensi')
             ->select('presensi.*', 'keterangan', 'jam_kerja.*', 'doc_sid', 'nama_cuti')
             ->leftJoin('jam_kerja', 'presensi.kode_jam_kerja', '=', 'jam_kerja.kode_jam_kerja')
@@ -39,6 +55,7 @@ class DashboardController extends Controller
             ->orderBy('tgl_presensi', 'desc')
             ->get();
 
+<<<<<<< HEAD
         // Menghitung rekap presensi (hadir, izin, sakit, cuti, terlambat) bulan ini
         $rekappresensi = DB::table('presensi')
             ->selectRaw('
@@ -47,6 +64,16 @@ class DashboardController extends Controller
                 SUM(IF(status="s",1,0)) as jmlsakit,
                 SUM(IF(status="c",1,0)) as jmlcuti,
                 SUM(IF(jam_in > jam_masuk ,1,0)) as jmlterlambat
+=======
+        $rekappresensi = DB::table('presensi')
+            ->selectRaw('
+            SUM(IF(status="h",1,0)) as jmlhadir,
+            SUM(IF(status="i",1,0)) as jmlizin,
+            SUM(IF(status="s",1,0)) as jmlsakit,
+            SUM(IF(status="c",1,0)) as jmlcuti,
+            SUM(IF(jam_in > jam_masuk ,1,0)) as jmlterlambat
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
             ')
             ->leftJoin('jam_kerja', 'presensi.kode_jam_kerja', '=', 'jam_kerja.kode_jam_kerja')
             ->where('nik', $nik)
@@ -54,12 +81,17 @@ class DashboardController extends Controller
             ->whereRaw('YEAR(tgl_presensi)="' . $tahunini . '"')
             ->first();
 
+<<<<<<< HEAD
         // Mengambil data leaderboard (urutan presensi tercepat) hari ini
+=======
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
         $leaderboard = DB::table('presensi')
             ->join('karyawan', 'presensi.nik', '=', 'karyawan.nik')
             ->where('tgl_presensi', $hariini)
             ->orderBy('jam_in')
             ->get();
+<<<<<<< HEAD
             
         // Daftar nama bulan untuk tampilan
         $namabulan = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -93,11 +125,39 @@ class DashboardController extends Controller
                 SUM(IF(status="s",1,0)) as jmlsakit,
                 SUM(IF(status="c",1,0)) as jmlcuti,
                 SUM(IF(jam_in > jam_masuk ,1,0)) as jmlterlambat
+=======
+        $namabulan = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+        $cabang = DB::table('cabang')->where('kode_cabang', $kode_cabang)->first();
+        $departemen = DB::table('departemen')->where('kode_dept', $kode_dept)->first();
+
+        return view('dashboard.dashboard', compact('presensihariini', 'historibulanini', 'namabulan', 'bulanini', 'tahunini', 'rekappresensi', 'leaderboard', 'cabang', 'departemen'));
+    }
+
+    public function dashboardadmin()
+    {
+
+
+        $hariini = date("Y-m-d");
+
+        $rekappresensi = DB::table('presensi')
+            ->selectRaw('
+            SUM(IF(status="h",1,0)) as jmlhadir,
+            SUM(IF(status="i",1,0)) as jmlizin,
+            SUM(IF(status="s",1,0)) as jmlsakit,
+            SUM(IF(status="c",1,0)) as jmlcuti,
+            SUM(IF(jam_in > jam_masuk ,1,0)) as jmlterlambat
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
             ')
             ->leftJoin('jam_kerja', 'presensi.kode_jam_kerja', '=', 'jam_kerja.kode_jam_kerja')
             ->where('tgl_presensi', $hariini)
             ->first();
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
         return view('dashboard.dashboardadmin', compact('rekappresensi'));
     }
 }

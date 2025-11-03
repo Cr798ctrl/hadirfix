@@ -1,12 +1,20 @@
 @extends('layouts.presensi')
 @section('header')
+<<<<<<< HEAD
+=======
+    <!-- App Header -->
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
     <div class="appHeader bg-primary text-light">
         <div class="left">
             <a href="javascript:;" class="headerButton goBack">
                 <ion-icon name="chevron-back-outline"></ion-icon>
             </a>
         </div>
+<<<<<<< HEAD
         <div class="pageTitle">Pengajuan Izin, Sakit, Cuti, Dinas Luar</div>
+=======
+        <div class="pageTitle">Data Izin / Sakit</div>
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
         <div class="right"></div>
     </div>
 
@@ -30,7 +38,12 @@
             border: 1px solid rgb(0, 136, 255);
         }
     </style>
+<<<<<<< HEAD
     @endsection
+=======
+    <!-- * App Header -->
+@endsection
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
 @section('content')
     <div class="row" style="margin-top:70px">
         <div class="col">
@@ -70,7 +83,11 @@
                             <select name="tahun" id="tahun" class="form-control selectmaterialize">
                                 <option value="">Tahun</option>
                                 @php
+<<<<<<< HEAD
                                     $tahun_awal = 2024;
+=======
+                                    $tahun_awal = 2022;
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                                     $tahun_sekarang = date('Y');
                                     for ($t = $tahun_awal; $t <= $tahun_sekarang; $t++) {
                                         if (Request('tahun') == $t) {
@@ -79,7 +96,11 @@
                                             $selected = '';
                                         }
                                         echo "<option $selected value='$t'>$t</option>";
+<<<<<<< HEAD
                                     } @endphp
+=======
+                                } @endphp
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                             </select>
                         </div>
                     </div>
@@ -104,8 +125,11 @@
                         $status = 'Sakit';
                     } elseif ($d->status == 'c') {
                         $status = 'Cuti';
+<<<<<<< HEAD
                     } elseif ($d->status == 'd') { // ADDED DINAS LUAR STATUS CHECK
                         $status = 'Dinas Luar';
+=======
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                     } else {
                         $status = 'Not Found';
                     }
@@ -124,9 +148,12 @@
                                 @elseif($d->status == 'c')
                                     <ion-icon name="calendar-outline"
                                         style="font-size: 48px; color:rgb(237, 128, 5)"></ion-icon>
+<<<<<<< HEAD
                                 @elseif($d->status == 'd')
                                     <ion-icon name="business-outline"
                                         style="font-size: 48px; color:rgb(0, 128, 0)"></ion-icon>
+=======
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                                 @endif
                             </div>
                             <div class="datapresensi">
@@ -166,6 +193,28 @@
                         </div>
                     </div>
                 </div>
+<<<<<<< HEAD
+=======
+                {{-- <ul class="listview image-listview">
+            <li>
+                <div class="item">
+                    <div class="in">
+                        <div>
+                            <b>{{ date("d-m-Y",strtotime($d->tgl_izin_dari)) }} ({{ $d->status== "s" ? "Sakit" : "Izin" }})</b><br>
+        <small class="text-muted">{{ $d->keterangan }}</small>
+    </div>
+    @if ($d->status_approved == 0)
+    <span class="badge bg-warning">Waiting</span>
+    @elseif($d->status_approved==1)
+    <span class="badge bg-success">Approved</span>
+    @elseif($d->status_approved==2)
+    <span class="badge bg-danger">Decline</span>
+    @endif
+</div>
+</div>
+</li>
+</ul> --}}
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
             @endforeach
         </div>
     </div>
@@ -176,15 +225,24 @@
         <div class="dropdown-menu">
             <a class="dropdown-item bg-primary" href="/izinabsen">
                 <ion-icon name="document-outline" role="img" class="md hydrated" aria-label="image outline"></ion-icon>
+<<<<<<< HEAD
                 <p>Izin</p>
             </a>
 
             <a class="dropdown-item bg-primary" href="/izinsakit">
                 <ion-icon name="medkit-outline" role="img" class="md hydrated"
+=======
+                <p>Izin Absen</p>
+            </a>
+
+            <a class="dropdown-item bg-primary" href="/izinsakit">
+                <ion-icon name="document-outline" role="img" class="md hydrated"
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                     aria-label="videocam outline"></ion-icon>
                 <p>Sakit</p>
             </a>
             <a class="dropdown-item bg-primary" href="/izincuti">
+<<<<<<< HEAD
                 <ion-icon name="calendar-outline" role="img" class="md hydrated"
                     aria-label="videocam outline"></ion-icon>
                 <p>Cuti</p>
@@ -194,6 +252,12 @@
                     aria-label="videocam outline"></ion-icon>
                 <p>Dinas Luar</p>
             </a>
+=======
+                <ion-icon name="document-outline" role="img" class="md hydrated"
+                    aria-label="videocam outline"></ion-icon>
+                <p>Cuti</p>
+            </a>
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
         </div>
     </div>
 
@@ -249,4 +313,8 @@
             });
         });
     </script>
+<<<<<<< HEAD
 @endpush
+=======
+@endpush
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759

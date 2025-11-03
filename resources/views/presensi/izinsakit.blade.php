@@ -231,10 +231,15 @@
                                             Izin
                                         @elseif ($d->status == 's')
                                             Sakit
+<<<<<<< HEAD
                                         @elseif ($d->status == 'c')
                                             Cuti
                                         @elseif ($d->status == 'd')
                                             Dinas Luar
+=======
+                                        @elseif ($d->status = 'c')
+                                            Cuti
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                                         @endif
                                     </td>
                                     <td>
@@ -314,7 +319,11 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
+<<<<<<< HEAD
                     <h5 class="modal-title">Konfirmasi</h5>
+=======
+                    <h5 class="modal-title">Izin/Sakit</h5>
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">

@@ -9,7 +9,10 @@ use App\Http\Controllers\HariliburController;
 use App\Http\Controllers\IzinabsenController;
 use App\Http\Controllers\IzincutiController;
 use App\Http\Controllers\IzinsakitController;
+<<<<<<< HEAD
 use App\Http\Controllers\IzindinasController;
+=======
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\KonfigurasiController;
 use App\Http\Controllers\PresensiController;
@@ -78,6 +81,10 @@ Route::middleware(['auth:karyawan'])->group(function () {
     Route::post('/presensi/cekpengajuanizin', [PresensiController::class, 'cekpengajuanizin']);
 
     //Izin Absen
+<<<<<<< HEAD
+=======
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
     Route::get('/izinabsen', [IzinabsenController::class, 'create']);
     Route::post('/izinabsen/store', [IzinabsenController::class, 'store']);
     Route::get('/izinabsen/{kode_izin}/edit', [IzinabsenController::class, 'edit']);
@@ -87,11 +94,14 @@ Route::middleware(['auth:karyawan'])->group(function () {
     Route::post('/izinsakit/store', [IzinsakitController::class, 'store']);
     Route::get('/izinsakit/{kode_izin}/edit', [IzinsakitController::class, 'edit']);
     Route::post('/izinsakit/{kode_izin}/update', [IzinsakitController::class, 'update']);
+<<<<<<< HEAD
     //Izin Dinas Luar
     Route::get('/izindinas', [IzindinasController::class, 'create']);
     Route::post('/izindinas/store', [IzindinasController::class, 'store']);
     Route::get('/izindinas/{kode_izin}/edit', [IzindinasController::class, 'edit']);
     Route::post('/izindinas/{kode_izin}/update', [IzindinasController::class, 'update']);
+=======
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
     //Izin Cuti
     Route::get('/izincuti', [IzincutiController::class, 'create']);
     Route::post('/izincuti/store', [IzincutiController::class, 'store']);

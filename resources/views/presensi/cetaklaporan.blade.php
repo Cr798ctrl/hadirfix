@@ -1,18 +1,30 @@
 <!DOCTYPE html>
+<<<<<<< HEAD
 <html lang="id">
+=======
+<html lang="en">
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
 
 <head>
     <meta charset="utf-8">
     <title>Cetak Laporan</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css">
+<<<<<<< HEAD
+=======
+
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paper-css/0.4.1/paper.css">
 
     <style>
         @page {
+<<<<<<< HEAD
             size: 210mm 330mm portrait;
             /* Kertas F4 Portrait */
             margin-top: 1cm;
+=======
+            size: A3;
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
         }
 
         #title {
@@ -35,8 +47,12 @@
             border-collapse: collapse;
         }
 
+<<<<<<< HEAD
         .tabelpresensi tr th,
         .tabelpresensi tr td {
+=======
+        .tabelpresensi tr th, .tabelpresensi tr td {
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
             border: 1px solid #131212;
             padding: 5px;
             font-size: 14px;
@@ -47,6 +63,7 @@
         }
 
         .foto {
+<<<<<<< HEAD
             width: 35px;
             height: auto;
             object-fit: cover;
@@ -63,11 +80,21 @@
             border: 1px solid #131212;
             padding: 5px;
             font-size: 13px;
+=======
+            width: 27px;
+            height: 36px;
+        }
+        
+        body.A4.Portrait .sheet { 
+            width: 297mm !important; 
+            height: auto !important; 
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
         }
     </style>
 </head>
 
 <body>
+<<<<<<< HEAD
     @php
         use Carbon\Carbon;
         use Illuminate\Support\Facades\Storage;
@@ -305,6 +332,31 @@
         // =====================================================================
         // ================ AKHIR BLOK PERHITUNGAN BARU ================
         // =====================================================================
+=======
+    {{-- Memindahkan fungsi ke sini, di luar perulangan. --}}
+    @php
+        use Carbon\Carbon;
+        function hitungTerlambat($jamMasuk, $jamIn) {
+            $masuk = Carbon::parse($jamMasuk);
+            $in = Carbon::parse($jamIn);
+            if ($in->greaterThan($masuk)) {
+                $diff = $in->diff($masuk);
+                $output = 'Terlambat ';
+                $parts = [];
+                if ($diff->h > 0) {
+                    $parts[] = $diff->h . ' jam';
+                }
+                if ($diff->i > 0) {
+                    $parts[] = $diff->i . ' menit';
+                }
+                if ($diff->s > 0) {
+                    $parts[] = $diff->s . ' detik';
+                }
+                return $output . implode(', ', $parts);
+            }
+            return 'Tepat Waktu';
+        }
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
     @endphp
 
     <section class="sheet padding-10mm">
@@ -317,6 +369,7 @@
                     <span id="title">
                         LAPORAN PRESENSI PEGAWAI<br>
                         PERIODE {{ strtoupper($namabulan[$bulan]) }} {{ $tahun }}<br>
+<<<<<<< HEAD
                         SMK NEGERI 2 LANGSA<br>
                     </span>
                     <span><i>Jl. Jenderal Ahmad Yani, Paya Bujok Seuleumak, Kec. Langsa Baro, Kota Langsa, Aceh 24415</i></span>
@@ -324,6 +377,14 @@
             </tr>
         </table>
 
+=======
+                        NAMA SEKOLAH<br>
+                    </span>
+                    <span><i>Alamat Sekolah</i></span>
+                </td>
+            </tr>
+        </table>
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
         <table class="tabeldatakaryawan">
             <tr>
                 <td rowspan="4">
@@ -349,6 +410,7 @@
                 <td>{{ $karyawan->jabatan }}</td>
             </tr>
         </table>
+<<<<<<< HEAD
 
         <table class="tabelpresensi">
             <thead>
@@ -491,11 +553,59 @@
                     Langsa, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}<br>
                     Pegawai<br><br><br><br>
                     <b>{{ $karyawan->nama_lengkap }}</b><br>
+=======
+        <table class="tabelpresensi">
+            <tr>
+                <th>No.</th>
+                <th>Tanggal</th>
+                <th>Jam Masuk</th>
+                <th>Foto</th>
+                <th>Jam Pulang</th>
+                <th>Foto</th>
+                <th>Status</th>
+                <th>Keterangan</th>
+            </tr>
+            @foreach ($presensi as $d)
+                <tr>
+                    <td style="text-align: center">{{ $loop->iteration }}</td>
+                    <td>{{ \Carbon\Carbon::parse($d->tgl_presensi)->translatedFormat('d F Y') }}</td>
+                    <td>{{ $d->jam_in }}</td>
+                    <td><img src="{{ url(Storage::url('uploads/absensi/' . $d->foto_in)) }}" alt="" class="foto"></td>
+                    <td>{{ $d->jam_out ?? 'Belum Absen' }}</td>
+                    <td><img src="{{ $d->jam_out ? url(Storage::url('uploads/absensi/' . $d->foto_out)) : asset('assets/img/camera.jpg') }}" alt="" class="foto"></td>
+                    <td style="text-align: center">{{ $d->status }}</td>
+                    <td>
+                        {{ hitungTerlambat($d->jam_masuk, $d->jam_in) }}
+                    </td>
+                </tr>
+            @endforeach
+        </table>
+
+        <table width="100%" style="margin-top:20px">
+            <tr>
+                <td></td>
+                <td></td>
+                <td colspan="2" style="text-align: left">
+                    Mengetahui,<br>
+                    Kepala Sekolah<br><br><br><br>
+                    <u>Nama Kepsek</u><br>
+                    NIP. Kepsek
+                </td>
+                <td></td>
+                <td></td>
+                <td colspan="2" style="text-align: left">
+                    Langsa, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}<br>
+                    Pegawai<br><br><br><br>
+                    <u>{{ $karyawan->nama_lengkap }}</u><br>
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                     NIP/NPPPK. {{ $karyawan->nik }}
                 </td>
             </tr>
         </table>
     </section>
 </body>
+<<<<<<< HEAD
 
+=======
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
 </html>

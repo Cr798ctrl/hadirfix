@@ -42,6 +42,7 @@
                 <input type="text" id="jml_hari" name="jml_hari" class="form-control" autocomplete="off" placeholder="Jumlah Hari" readonly>
             </div>
             <div class="custom-file-upload" id="fileUpload1" style="height: 100px !important">
+<<<<<<< HEAD
     <input type="file" 
            name="sid" 
            id="fileuploadInput" 
@@ -57,6 +58,18 @@
     </label>
 </div>
 
+=======
+                <input type="file" name="sid" id="fileuploadInput" accept=".png, .jpg, .jpeg">
+                <label for="fileuploadInput">
+                    <span>
+                        <strong>
+                            <ion-icon name="cloud-upload-outline" role="img" class="md hydrated" aria-label="cloud upload outline"></ion-icon>
+                            <i>Tap to Upload SID</i>
+                        </strong>
+                    </span>
+                </label>
+            </div>
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
             <div class="form-group">
                 <input type="text" id="keterangan" name="keterangan" class="form-control" autocomplete="off" placeholder="Keterangan">
             </div>
@@ -133,11 +146,15 @@
         //     });
         // });
 
+<<<<<<< HEAD
                // Validasi form sebelum submit
+=======
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
         $("#frmIzin").submit(function() {
             var tgl_izin_dari = $("#tgl_izin_dari").val();
             var tgl_izin_sampai = $("#tgl_izin_sampai").val();
             var keterangan = $("#keterangan").val();
+<<<<<<< HEAD
             var file = $("#fileuploadInput")[0].files[0];
 
             if (tgl_izin_dari == "" || tgl_izin_sampai == "") {
@@ -145,10 +162,18 @@
                     title: 'Oops !',
                     text: 'Tanggal Harus Diisi',
                     icon: 'warning'
+=======
+            if (tgl_izin_dari == "" || tgl_izin_sampai == "") {
+                Swal.fire({
+                    title: 'Oops !'
+                    , text: 'Tanggal Harus Diisi'
+                    , icon: 'warning'
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                 });
                 return false;
             } else if (keterangan == "") {
                 Swal.fire({
+<<<<<<< HEAD
                     title: 'Oops !',
                     text: 'Keterangan Harus Diisi',
                     icon: 'warning'
@@ -159,6 +184,11 @@
                     title: 'Oops !',
                     text: 'Ukuran file maksimal 500 KB',
                     icon: 'warning'
+=======
+                    title: 'Oops !'
+                    , text: 'Keterangan Harus Diisi'
+                    , icon: 'warning'
+>>>>>>> f34d2e949c7444f2f0ea3adcc565a1d49c1d7759
                 });
                 return false;
             }
