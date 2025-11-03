@@ -82,15 +82,25 @@
         }
 
         // Fungsi untuk memformat total jam (desimal) menjadi "XX jam XX menit"
-        $formatDurasi = function ($totalJamDesimal) {
-            $totalMenit = round($totalJamDesimal * 60);
-            $jam = floor($totalMenit / 60);
-            $menit = $totalMenit % 60;
-            return sprintf('%02d jam %02d menit', $jam, $menit);
+        // 💡 DISAMAKAN DENGAN FUNGSI formatJamMenit DI LAPORAN SEBELUMNYA
+        $formatDurasi = function ($totalHours) {
+            if (!is_numeric($totalHours)) {
+                return '00 jam 00 menit';
+            }
+            $totalHours = abs($totalHours);
+            $hours = floor($totalHours);
+            $minutes = round(($totalHours - $hours) * 60);
+
+            if ($minutes >= 60) {
+                $hours += floor($minutes / 60);
+                $minutes %= 60;
+            }
+            return sprintf('%02d jam %02d menit', $hours, $minutes);
         };
 
         $today = date('Y-m-d');
-        // Jam Kerja Wajib Per Hari
+        
+        // Jam Kerja Wajib Per Hari (Sesuai Dashboard & CetakLaporan)
         $jamKerjaPerHari = [
             1 => 7,   // Senin
             2 => 7,   // Selasa
@@ -131,7 +141,6 @@
                     <th rowspan="2">D</th>
                     <th rowspan="2">A</th> 
                     <th rowspan="2">Total Jam Hadir</th>
-                    {{-- 💡 PERBAIKAN HEADER: Menambahkan Total Jam Kerja --}}
                     <th rowspan="2">Total Jam Kerja</th> 
                     <th rowspan="2">% Jam Hadir</th>
                 </tr>
@@ -146,59 +155,68 @@
             <tbody>
                 @foreach ($rekap as $r)
                     @php
-                        // 💡 PERBAIKAN INIALISASI: Menambahkan $dinasluar
+                        // =====================================================================
+                        // ================ BLOK INISIALISASI (PER EMPLOYEE) ================
+                        // =====================================================================
+                        
+                        // Kategori Status
                         $hadir = $izin = $sakit = $cuti = $alpa = $dinasluar = 0; 
+                        
+                        // Total Bulanan (Hasil Capping)
                         $totalJamHadir = 0;
                         $totalJamSeharusnya = 0;
-                        $tempHarilibur = collect($harilibur);
                         
+                        // Akumulator Mingguan (Untuk Capping)
                         $jamHadirMingguIni = 0;
                         $jamSeharusnyaMingguIni = 0;
-                        $isLastDayOfMonth = false;
+                        
+                        $tempHarilibur = collect($harilibur);
                     @endphp
                     <tr>
                         <td>{{ $r->nik }}</td>
                         <td>{{ $r->nama_lengkap }}</td>
                         @for ($i = 1; $i <= $jmlhari; $i++)
                             @php
+                                // =====================================================================
+                                // ================ BLOK PERHITUNGAN HARIAN (SAMA DENGAN DASHBOARD) ================
+                                // =====================================================================
+                                
                                 $tanggal = date('Y-m-d', strtotime($rangetanggal[$i - 1]));
                                 $currentDayCarbon = Carbon::parse($tanggal);
                                 $dayOfWeek = $currentDayCarbon->dayOfWeek; // 0=Minggu, 1=Senin, ..., 6=Sabtu
                                 
-                                $isWeekend = $currentDayCarbon->isSunday();
+                                $isWeekend = $currentDayCarbon->isSunday(); // Hanya Minggu libur
                                 $isHoliday = $tempHarilibur->where('tanggal_libur', $tanggal)->first();
-                                $isEndOfWorkWeek = $currentDayCarbon->isSaturday(); // Sabtulah penutup pekan kerja
-
-                                // Cek jika ini hari terakhir dari data yang direkap
-                                $isLastDayOfData = ($i == $jmlhari);
+                                $isEndOfWorkWeek = $currentDayCarbon->isSaturday(); // Sabtu penutup pekan kerja
+                                $isLastDayOfData = ($i == $jmlhari); // Hari terakhir di loop
 
                                 $bgColor = 'white';
                                 $statusDisplay = '';
                                 $jamSeharusnyaHariIni = 0;
                                 $jamHadirHariIni = 0;
                                 $tambahJamSeharusnya = false;
-                            @endphp
                             
-                            {{-- LOGIKA UTAMA PERHITUNGAN DAN CAPPING --}}
-                            @php
+                                // --- 1. Logika Hari Libur/Minggu ---
                                 if ($isWeekend || $isHoliday) {
-                                    // Warna Hari Minggu/Libur Nasional
                                     $bgColor = $isWeekend ? '#ea4b16' : '#99ff99'; 
-                                    $statusDisplay = $isWeekend ? 'M' : 'L'; // Tambah M/L untuk keterangan libur
+                                    $statusDisplay = $isWeekend ? 'M' : 'L';
                                     
-                                    // Capping Cepat untuk Hari Libur/Minggu
-                                    if ($jamSeharusnyaMingguIni > 0) {
-                                        $totalJamHadir += min($jamHadirMingguIni, $jamSeharusnyaMingguIni);
-                                        $totalJamSeharusnya += $jamSeharusnyaMingguIni;
-                                        $jamHadirMingguIni = 0;
-                                        $jamSeharusnyaMingguIni = 0;
+                                    // Lakukan Capping jika ini hari Minggu (penutup) atau hari terakhir data
+                                    if ($currentDayCarbon->isSunday() || $isLastDayOfData) { 
+                                        if ($jamSeharusnyaMingguIni > 0) {
+                                            $totalJamHadir += min($jamHadirMingguIni, $jamSeharusnyaMingguIni);
+                                            $totalJamSeharusnya += $jamSeharusnyaMingguIni;
+                                            $jamHadirMingguIni = 0;
+                                            $jamSeharusnyaMingguIni = 0;
+                                        }
                                     }
-
                                 } elseif ($tanggal > $today) {
                                     $statusDisplay = ''; // Hari belum terjadi
+                                
                                 } else {
-                                    // Ini adalah hari kerja (Senin-Sabtu)
+                                    // --- 2. Logika Hari Kerja (Senin - Sabtu, non-libur) ---
                                     $jamSeharusnyaHariIni = $jamKerjaPerHari[$dayOfWeek];
+                                    $tambahJamSeharusnya = true; // Hari kerja (I/S/C/A/D) tetap dihitung jam standarnya
                                     
                                     $dataAbsensi = isset($r->{"tgl_" . $i}) ? explode("|", $r->{"tgl_" . $i}) : [];
                                     $status = strtolower(trim($dataAbsensi[2] ?? ''));
@@ -206,85 +224,83 @@
                                     if ($status == 'h') {
                                         $statusDisplay = 'H';
                                         $hadir++;
-                                        $tambahJamSeharusnya = true;
                                         
                                         $jam_in = trim($dataAbsensi[0] ?? '');
                                         $jam_out = trim($dataAbsensi[1] ?? '');
-
                                         $isValidJamIn = !empty($jam_in) && !in_array($jam_in, ['NA', '00:00:00']);
                                         $isValidJamOut = !empty($jam_out) && !in_array($jam_out, ['NA', '00:00:00']);
 
                                         if ($isValidJamIn && $isValidJamOut) {
+                                            // Hadir Penuh (Hitung Durasi)
                                             $jamIn = Carbon::parse($tanggal . ' ' . $jam_in);
                                             $jamOut = Carbon::parse($tanggal . ' ' . $jam_out);
                                             $durasiMenit = $jamOut->diffInMinutes($jamIn);
 
-                                            // Logika Potongan Jam Istirahat (contoh untuk Jumat 12:00-14:00)
                                             if ($dayOfWeek == Carbon::FRIDAY) {
                                                 $breakStart = Carbon::parse($tanggal . ' 12:00:00');
                                                 $breakEnd = Carbon::parse($tanggal . ' 14:00:00');
                                                 if ($jamIn->lte($breakStart) && $jamOut->gte($breakEnd)) {
-                                                    $durasiMenit -= 120; // Potong 2 jam istirahat
+                                                    $durasiMenit -= 120;
                                                 }
                                             }
                                             $jamHadirHariIni = $durasiMenit / 60;
                                             $bgColor = 'white';
                                         } elseif ($isValidJamIn && !$isValidJamOut) {
-                                            // Lupa Absen Pulang (Hadir 50% dari Jam Wajib Hari Itu)
+                                            // Lupa Absen Pulang (Logika Dashboard: 50%)
                                             $jamHadirHariIni = ($jamKerjaPerHari[$dayOfWeek] / 2);
-                                            $bgColor = '#fffacd';
+                                            $bgColor = '#fffacd'; // Kuning
                                         } else {
-                                            // Tidak Absen In/Out (Dianggap Alpa 100%)
+                                            // Status 'h' tapi tidak ada jam_in (dianggap alpa)
                                             $statusDisplay = 'A';
                                             $alpa++;
-                                            $tambahJamSeharusnya = true;
-                                            $bgColor = '#ff000030';
+                                            $hadir--; // Batalkan $hadir++ di atas
+                                            $jamHadirHariIni = 0;
+                                            $bgColor = '#ff000030'; // Merah
                                         }
+                                        
                                     } elseif ($status == 'i') {
                                         $statusDisplay = 'I';
                                         $izin++;
-                                        $tambahJamSeharusnya = true;
-                                        $jamHadirHariIni = $jamKerjaPerHari[$dayOfWeek]; // Dihitung Hadir 100%
-                                        $bgColor = '#b3e0ff';
+                                        $jamHadirHariIni = 0; // KOREKSI UTAMA: Izin = 0 jam hadir
+                                        $bgColor = '#b3e0ff'; // Biru
                                     } elseif ($status == 's') {
                                         $statusDisplay = 'S';
                                         $sakit++;
-                                        $tambahJamSeharusnya = true;
-                                        $jamHadirHariIni = $jamKerjaPerHari[$dayOfWeek]; // Dihitung Hadir 100%
-                                        $bgColor = '#800080';
+                                        $jamHadirHariIni = 0; // KOREKSI UTAMA: Sakit = 0 jam hadir
+                                        $bgColor = '#800080'; // Ungu
                                     } elseif ($status == 'c') {
                                         $statusDisplay = 'C';
                                         $cuti++;
-                                        $tambahJamSeharusnya = true;
-                                        $jamHadirHariIni = $jamKerjaPerHari[$dayOfWeek]; // Dihitung Hadir 100%
-                                        $bgColor = '#e6ccff';
+                                        $jamHadirHariIni = 0; // KOREKSI UTAMA: Cuti = 0 jam hadir
+                                        $bgColor = '#e6ccff'; // Ungu muda
                                     } elseif ($status == 'd') {
-                                        // 💡 LOGIKA DINAS LUAR (D)
-                                        $statusDisplay = 'D'; // Diubah dari DL menjadi D agar lebih ringkas
+                                        $statusDisplay = 'D';
                                         $dinasluar++;
-                                        $tambahJamSeharusnya = true;
-                                        $jamHadirHariIni = $jamKerjaPerHari[$dayOfWeek]; // Dihitung hadir 100%
-                                        $bgColor = '#ffe4b5'; 
+                                        $jamHadirHariIni = $jamKerjaPerHari[$dayOfWeek]; // SAMA DENGAN DASHBOARD (Hadir 100%)
+                                        $bgColor = '#ffe4b5'; // Oranye muda
                                     } else {
+                                        // Tidak ada status (Alpa)
                                         $statusDisplay = 'A';
                                         $alpa++;
-                                        $tambahJamSeharusnya = true;
-                                        $bgColor = '#ff000030';
+                                        $jamHadirHariIni = 0;
+                                        $bgColor = '#ff000030'; // Merah
                                     }
-
+                                    
                                     // Akumulasi Jam Mingguan
                                     $jamHadirMingguIni += $jamHadirHariIni;
                                     if ($tambahJamSeharusnya) {
                                         $jamSeharusnyaMingguIni += $jamSeharusnyaHariIni;
                                     }
 
-                                    // Capping akhir pekan kerja (Sabtu)
-                                    if ($isEndOfWorkWeek) {
-                                        $totalJamHadir += min($jamHadirMingguIni, $jamSeharusnyaMingguIni);
-                                        $totalJamSeharusnya += $jamSeharusnyaMingguIni;
-                                        
-                                        $jamHadirMingguIni = 0;
-                                        $jamSeharusnyaMingguIni = 0;
+                                    // --- 3. LOGIKA CAPPING MINGGUAN (Sabtu atau Hari Terakhir) ---
+                                    if ($isEndOfWorkWeek || $isLastDayOfData) {
+                                        if ($jamSeharusnyaMingguIni > 0) {
+                                            $totalJamHadir += min($jamHadirMingguIni, $jamSeharusnyaMingguIni);
+                                            $totalJamSeharusnya += $jamSeharusnyaMingguIni;
+                                            
+                                            $jamHadirMingguIni = 0;
+                                            $jamSeharusnyaMingguIni = 0;
+                                        }
                                     }
                                 }
                             @endphp
@@ -293,14 +309,19 @@
                             <td style="text-align: center; background-color: {{ $bgColor }}">{{ $statusDisplay }}</td>
                         @endfor
                         
-                        {{-- 💡 FINAL CAPPING: Tambahkan sisa jam dari pekan terakhir --}}
                         @php
-                            if ($jamSeharusnyaMingguIni > 0) {
-                                $totalJamHadir += min($jamHadirMingguIni, $jamSeharusnyaMingguIni);
-                                $totalJamSeharusnya += $jamSeharusnyaMingguIni;
-                            }
-
-                            // Perhitungan Persentase
+                            // =====================================================================
+                            // ================ BLOK FINALISASI (PER EMPLOYEE) ================
+                            // =====================================================================
+                            
+                            // 💡 FINAL CAPPING (Sudah ditangani oleh $isLastDayOfData di dalam loop)
+                            // Blok ini menggantikan @php lama (line 272 di file asli)
+                            
+                            // Perhitungan Persentase (Menggunakan total akhir yang sudah di-cap)
+                            // Variabel $totalJamHadirTampilan dan $totalJamSeharusnyaTampilan tidak diperlukan
+                            // karena loop ini SELALU sampai akhir bulan (atau hari ini),
+                            // sehingga $totalJamHadir dan $totalJamSeharusnya adalah nilai final.
+                            
                             $persentase = ($totalJamSeharusnya > 0) ? ($totalJamHadir / $totalJamSeharusnya) * 100 : 0;
                             $persentase = number_format(min($persentase, 100), 2); // Batasi 100% dan 2 desimal
                         @endphp
@@ -313,7 +334,6 @@
                         <td style="text-align: center">{{ $dinasluar }}</td>
                         <td style="text-align: center">{{ $alpa }}</td>
                         <td style="text-align: center">{{ $formatDurasi($totalJamHadir) }}</td>
-                        {{-- 💡 OUTPUT TOTAL JAM KERJA & % HADIR --}}
                         <td style="text-align: center">{{ $formatDurasi($totalJamSeharusnya) }}</td> 
                         <td style="text-align: center">{{ $persentase }} %</td>
                     </tr>

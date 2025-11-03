@@ -33,6 +33,11 @@
     $cutiBulanan = 0;
     $dinasLuarBulanan = 0; // BARU: Menambahkan Dinas Luar
     $alpaBulanan = 0;
+    
+    // ==========================================================
+    // == PENAMBAHAN VARIABEL BARU UNTUK REKAP STATUS PROFESIONAL ==
+    $totalHariKerjaEfektif = 0; 
+    // ==========================================================
 
     // Inisialisasi variabel mingguan untuk CAPPING
     $jamHadirMingguIni = 0;
@@ -81,6 +86,12 @@
         }
 
         // --- 2. Logika Hari Kerja (Senin - Sabtu) ---
+        
+        // ==========================================================
+        // == PENAMBAHAN LOGIKA HITUNG HARI KERJA EFEKTIF ==
+        $totalHariKerjaEfektif++;
+        // ==========================================================
+        
         $jamSeharusnyaHariIni = $jamKerjaHarian[$dayOfWeek];
         $jamHadirHariIni = 0;
         $tambahJamSeharusnya = true; 
@@ -247,18 +258,6 @@
         color: #212121;
     }
     
-    /* MODIFIKASI: Menambahkan style untuk logo */
-    .logo-header {
-        position: absolute;
-        right: 50px; /* Jarak dari kanan, di sebelah tombol logout */
-        top: 20px; /* Sejajar dengan tombol logout */
-        width: 35px; /* Sesuaikan ukuran logo */
-        height: 35px; /* Sesuaikan ukuran logo */
-        z-index: 10;
-        cursor: pointer;
-    }
-    /* AKHIR MODIFIKASI */
-
     .card {
         background-color: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(6px);
@@ -601,23 +600,205 @@
         from {transform:scale(0)} 
         to {transform:scale(1)}
     }
-    .logo-header {
-    position: absolute;
-    right: 40px; /* Jarak dari kanan, di sebelah tombol logout */
-    /* UBAH UKURAN: Menyesuaikan agar sama dengan tinggi foto profil (60px) */
-    width: 75px; /* Lebar 60px */
-    height: 75px; /* Tinggi 60px */
-    /* UBAH POSISI: Sesuaikan posisi 'top' agar sejajar dengan foto profil yang berjarak 15px dari atas */
-    top: 36px; 
-    z-index: 10;
-    cursor: pointer;
-}
+
+    {{-- ========================================================== --}}
+    {{-- ================ CSS UNTUK CHART DIMULAI ================ --}}
+    {{-- ========================================================== --}}
+
+    .rekap-chart-container {
+        display: flex;
+        align-items: center;
+        justify-content: center; /* <<< MODIFIKASI 1: Diubah dari space-around */
+        padding: 16px 10px;
+        width: 100%;
+    }
+
+    .circular-chart-wrapper {
+        flex-shrink: 0;
+        margin-right: 15px;
+    }
+
+    .circular-chart {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        /* Ini adalah 'track' (abu-abu) */
+        background: #eef2f7; 
+    }
+
+    /* Ini adalah progress barnya (hijau) */
+    .circular-chart::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        /* Menggunakan CSS Variable '--persentase' yang di-set dari Blade.
+           'conic-gradient' akan menggambar progress.
+        */
+        background: conic-gradient(
+            #43A047 calc(var(--persentase) * 3.6deg), 
+            transparent calc(var(--persentase) * 3.6deg)
+        );
+        /* Putar -90deg agar 0% ada di atas (12 o'clock) */
+        transform: rotate(-90deg);
+    }
+
+    /* Ini adalah dot/handle di *akhir* progress */
+    .circular-chart::after {
+        content: '';
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        background: #43A047;
+        border: 2px solid #fff;
+        border-radius: 50%;
+        z-index: 3;
+        top: 50%;
+        left: 50%;
+        /* Kalkulasi posisi dot:
+           (120px chart / 2) - (14px dot / 2) = 60 - 7 = 53px
+           Dot ini akan berputar mengikuti nilai '--persentase'
+        */
+        transform: 
+            rotate(calc(var(--persentase) * 3.6deg - 90deg)) /* Putar ke posisi persentase */
+            translate(53px) /* Geser ke tepi */
+            rotate(calc(var(--persentase) * -3.6deg + 90deg)); /* Luruskan dot-nya */
+    }
+
+    /* Lingkaran putih di tengah */
+    .chart-inner-circle {
+        width: 100px; /* (120px - 20px tebal) */
+        height: 100px;
+        background: #fff;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 2; /* Di atas progress bar, di bawah dot */
+        position: relative; 
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .chart-percentage {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #212121;
+        line-height: 1.2;
+    }
+
+    .chart-label {
+        font-size: 0.8rem;
+        color: #616161;
+        margin-top: -2px;
+    }
+
+    /* Kanan: Detail Teks (Jam Hadir & Jam Kerja) */
+    .chart-details {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        /* flex-grow: 1; */ /* <<< MODIFIKASI 2: Dihapus agar tidak memenuhi ruang */
+        gap: 12px; /* Jarak antar item */
+    }
+
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.3;
+    }
+
+    .detail-label {
+        font-size: 0.9rem;
+        color: #616161;
+    }
+
+    .detail-value {
+        font-size: 1.0rem;
+        font-weight: 600;
+        color: #212121;
+    }
+
+    /* Mewarnai teks sesuai gambar */
+    #chart-jam-hadir {
+        color: #43A047; /* Hijau */
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    #chart-jam-kerja {
+        color: #333; /* Hitam/Abu tua */
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+    
+    {{-- ========================================================== --}}
+    {{-- ================== CSS UNTUK CHART SELESAI ================== --}}
+    {{-- ========================================================== --}}
+    
+    
+    {{-- ========================================================== --}}
+    {{-- ================ CSS UNTUK LEADERBOARD BARU ================ --}}
+    {{-- ========================================================== --}}
+    .leaderboard-item .rank-icon {
+        width: 20px;  /* <<< DIPERKECIL */
+        height: 20px; /* <<< DIPERKECIL */
+        font-size: 0.7rem; /* <<< DIPERKECIL */
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin-right: 10px;
+        flex-shrink: 0;
+        color: #fff;
+    }
+
+    /* Medali Emas */
+    .leaderboard-item.rank-1 .rank-icon {
+        background: linear-gradient(135deg, #FFD700, #FFAA00); /* Emas */
+        box-shadow: 0 2px 5px rgba(255, 215, 0, 0.5);
+    }
+
+    /* Medali Perak */
+    .leaderboard-item.rank-2 .rank-icon {
+        background: linear-gradient(135deg, #C0C0C0, #A0A0A0); /* Perak */
+        box-shadow: 0 2px 5px rgba(192, 192, 192, 0.5);
+    }
+
+    /* Medali Perunggu */
+    .leaderboard-item.rank-3 .rank-icon {
+        background: linear-gradient(135deg, #CD7F32, #A05A2C); /* Perunggu */
+        box-shadow: 0 2px 5px rgba(205, 127, 50, 0.5);
+    }
+
+    /* Peringkat 4+ */
+    .leaderboard-item:not(.rank-1, .rank-2, .rank-3) .rank-icon {
+        background-color: #6c757d; /* Abu-abu */
+    }
+    
+    /* Pemisah antara Leaderboard dan Status Lain */
+    .list-divider {
+        padding: 10px 16px;
+        font-weight: 600;
+        color: #6c757d;
+        background-color: #eef2f7;
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+        margin-top: 10px;
+    }
+    {{-- ========================================================== --}}
+    {{-- ================ AKHIR CSS LEADERBOARD BARU ================ --}}
+    {{-- ========================================================== --}}
     
 </style>
 
 <div class="section" id="user-section">
-    {{-- MODIFIKASI: Menambahkan Logo --}}
-    <img src="{{ asset('assets/img/logopresensi.png') }}" alt="Logo Presensi" class="logo-header">
+    {{-- LOGO HEADER DIHAPUS SESUAI PERMINTAAN --}}
     
     <a href="/proseslogout" class="logout">
         <ion-icon name="exit-outline"></ion-icon>
@@ -702,25 +883,27 @@
                 <div class="card gradasigreen">
                     <div class="card-body">
                         <div class="presence-item">
+                            
+                            {{-- MODIFIKASI IKON MASUK (CENTANG) --}}
                             <div class="iconpresence">
-                                @if ($presensihariini != null)
-                                    @if ($presensihariini->foto_in != null)
-                                        @php
-                                            $path = Storage::url('uploads/absensi/' . $presensihariini->foto_in);
-                                        @endphp
-                                        <img src="{{ url($path) }}" alt="Foto Masuk" class="imaged">
-                                    @else
-                                        <ion-icon name="camera" style="font-size: 70px;"></ion-icon>
-                                    @endif
+                                @if ($presensihariini != null && $presensihariini->foto_in != null)
+                                    @php
+                                        $path = Storage::url('uploads/absensi/' . $presensihariini->foto_in);
+                                    @endphp
+                                    <img src="{{ url($path) }}" alt="Foto Masuk" class="imaged">
+                                @elseif ($presensihariini != null && $presensihariini->jam_in != null)
+                                    {{-- SUDAH ABSEN, TAPI MUNGKIN TANPA FOTO --}}
+                                    <ion-icon name="checkmark-circle" style="font-size: 70px; color: #fff;"></ion-icon>
                                 @else
-                                    <ion-icon name="camera" style="font-size: 70px;"></ion-icon>
+                                    {{-- BELUM ABSEN --}}
+                                    <ion-icon name="camera" style="font-size: 70px; color: #fff;"></ion-icon>
                                 @endif
                             </div>
+                            
                             <div class="presencedetail">
                                 <h4 class="presencetitle">Masuk</h4>
                                 <span>{{ $presensihariini != null ? $presensihariini->jam_in : 'Belum Absen' }}</span>
                                         @if($presensihariini != null && $presensihariini->jam_in > $jamMasukKantor)
-                                {{-- Diubah: Menambahkan inline style untuk warna putih --}}
                                 <span class="text-late" style="color: white !important;">(Terlambat)</span>
                                 @endif
                             </div>
@@ -732,20 +915,23 @@
                 <div class="card gradasired">
                     <div class="card-body">
                         <div class="presence-item">
+
+                            {{-- MODIFIKASI IKON PULANG (CENTANG) --}}
                             <div class="iconpresence">
-                                @if ($presensihariini != null && $presensihariini->jam_out != null)
-                                    @if ($presensihariini->foto_out != null)
-                                        @php
-                                            $path = Storage::url('uploads/absensi/' . $presensihariini->foto_out);
-                                        @endphp
-                                        <img src="{{ url($path) }}" alt="Foto Pulang" class="imaged">
-                                    @else
-                                        <ion-icon name="camera" style="font-size: 70px;"></ion-icon>
-                                    @endif
+                                @if ($presensihariini != null && $presensihariini->foto_out != null)
+                                    @php
+                                        $path = Storage::url('uploads/absensi/' . $presensihariini->foto_out);
+                                    @endphp
+                                    <img src="{{ url($path) }}" alt="Foto Pulang" class="imaged">
+                                @elseif ($presensihariini != null && $presensihariini->jam_out != null)
+                                    {{-- SUDAH ABSEN PULANG, TAPI MUNGKIN TANPA FOTO --}}
+                                    <ion-icon name="checkmark-circle" style="font-size: 70px; color: #fff;"></ion-icon>
                                 @else
-                                    <ion-icon name="camera" style="font-size: 70px;"></ion-icon>
+                                    {{-- BELUM ABSEN PULANG --}}
+                                    <ion-icon name="camera" style="font-size: 70px; color: #fff;"></ion-icon>
                                 @endif
                             </div>
+
                             <div class="presencedetail">
                                 <h4 class="presencetitle">Pulang</h4>
                                 <span>{{ $presensihariini != null && $presensihariini->jam_out != null ? $presensihariini->jam_out : 'Belum Absen' }}</span>
@@ -758,85 +944,64 @@
     </div>
 
     <div class="section mt-2" id="rekappresensi">
-  <h3 class="text-center">Rekap Hadir Bulan Ini</h3>
+        <h3 class="text-center">Rekap Hadir Bulan Ini</h3>
         <div class="card">
             <div class="card-body">
-                <table class="recap-table">
-                    <thead class="header-row">
-                        <tr>
-                            <th>Total Jam Kerja</th>
-                            <th>Total Jam Hadir</th>
-                            <th> Persentase</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="cell-jam-kerja">{{ sprintf('%02d', $totalJamKerjaJam) }} Jam {{ sprintf('%02d', $totalJamKerjaMenit) }} Menit</td>
-                            <td class="cell-jam-hadir">{{ sprintf('%02d', $totalJamHadirJam) }} Jam {{ sprintf('%02d', $totalJamHadirMenit) }} Menit</td>
-                            <td class="cell-kehadiran">{{ number_format($persentase, 2) }} %</td>
-                        </tr>
-                    </tbody>
-                </table>
-               {{-- Card Rekap Status Harian (Versi Paling Ringkas) --}}
-<h6 class="mt-3 mb-1 text-center" style="font-size: 1rem;"></h6>
-<div class="row">
-    
-    {{-- Hadir --}}
-    <div class="col-2">
-        <div class="text-center p-1" style="border: 1px solid #43A047; border-radius: 5px;">
-            <p class="m-0 text-success-new" style="font-size: 1.1rem; font-weight: bold; line-height: 1;">{{ $hadirBulanan }}</p>
-            <small class="m-0" style="font-size: 0.65rem;">Hadir</small>
-        </div>
-    </div>
 
-    {{-- Izin --}}
-    <div class="col-2">
-        <div class="text-center p-1" style="border: 1px solid #1E88E5; border-radius: 5px;">
-            <p class="m-0 text-primary-new" style="font-size: 1.1rem; font-weight: bold; line-height: 1;">{{ $izinBulanan }}</p>
-            <small class="m-0" style="font-size: 0.65rem;">Izin</small>
-        </div>
-    </div>
+                {{-- ========================================================== --}}
+                {{-- ================ MULAI BLOK CHART TENGAH ================= --}}
+                {{-- ========================================================== --}}
 
-    {{-- Sakit --}}
-    <div class="col-2">
-        <div class="text-center p-1" style="border: 1px solid #FDD835; border-radius: 5px;">
-            <p class="m-0 text-warning-new" style="font-size: 1.1rem; font-weight: bold; line-height: 1;">{{ $sakitBulanan }}</p>
-            <small class="m-0" style="font-size: 0.65rem;">Sakit</small>
-        </div>
-    </div>
+                <div class="rekap-chart-container">
+                    <div class="circular-chart-wrapper">
+                        <div class="circular-chart" style="--persentase: {{ $persentase ?? 0 }};">
+                            <div class="chart-inner-circle">
+                                <span class="chart-percentage">{{ number_format($persentase, 1) }}%</span>
+                                <span class="chart-label">Kehadiran</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Jam Hadir:</span>
+                            <span class="detail-value" id="chart-jam-hadir">
+                                {{ sprintf('%02d', $totalJamHadirJam) }} Jam {{ sprintf('%02d', $totalJamHadirMenit) }} Mnt
+                            </span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Jam Kerja:</span>
+                            <span class="detail-value" id="chart-jam-kerja">
+                                {{ sprintf('%02d', $totalJamKerjaJam) }} Jam {{ sprintf('%02d', $totalJamKerjaMenit) }} Mnt
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                {{-- ========================================================== --}}
+                {{-- ================== SELESAI BLOK CHART TENGAH ================= --}}
+                {{-- ========================================================== --}}
 
-    {{-- Cuti --}}
-    <div class="col-2">
-        <div class="text-center p-1" style="border: 1px solid #8E24AA; border-radius: 5px;">
-            <p class="m-0 text-info-new" style="font-size: 1.1rem; font-weight: bold; line-height: 1;">{{ $cutiBulanan }}</p>
-            <small class="m-0" style="font-size: 0.65rem;">Cuti</small>
-        </div>
-    </div>
-    
-    {{-- Dinas Luar (D) --}}
-    <div class="col-2">
-        <div class="text-center p-1" style="border: 1px solid #4CAF50; border-radius: 5px;">
-            <p class="m-0 text-success" style="font-size: 1.1rem; font-weight: bold; line-height: 1;">{{ $dinasLuarBulanan }}</p>
-            <small class="m-0" style="font-size: 0.65rem;">D. Luar</small>
-        </div>
-    </div>
-
-    {{-- Alpa --}}
-    <div class="col-2">
-        <div class="text-center p-1" style="border: 1px solid #E53935; border-radius: 5px;">
-            <p class="m-0 text-danger" style="font-size: 1.1rem; font-weight: bold; line-height: 1;">{{ $alpaBulanan }}</p>
-            <small class="m-0" style="font-size: 0.65rem;">Alpa</small>
-        </div>
-    </div>
-
-</div>
+               
+                {{-- Tombol untuk Modal Rekap Status (Biarkan tetap di sini) --}}
+                <div class="mt-3">
+                    <button class="btn btn-primary btn-block" id="btnShowRekapStatus" style="border-radius: 8px;">
+                        <ion-icon name="stats-chart-outline" style="vertical-align: middle; margin-right: 5px;"></ion-icon>
+                        Lihat Rekap Status
+                    </button>
+                </div>
                 
             </div>
         </div>
     </div>
 
     <div class="presencetab mt-2">
-        <div class="tab-pane fade show active" id="pilled" role="tabpanel">
+        {{-- ========================================================== --}}
+        {{-- ================ PERBAIKAN TAB YANG HILANG ================ --}}
+        {{-- ========================================================== --}}
+        
+        {{-- Kelas 'tab-pane fade show active' DIHAPUS dari div ini --}}
+        <div id="pilled"> 
             <ul class="nav nav-tabs style1" role="tablist">
                 <li class="nav-item">
                     <a class="nav-link active" data-toggle="tab" href="#home" role="tab">
@@ -850,16 +1015,25 @@
                 </li>
             </ul>
         </div>
+        
+        {{-- ========================================================== --}}
+        {{-- ================ AKHIR PERBAIKAN TAB ===================== --}}
+        {{-- ========================================================== --}}
+        
         <div class="tab-content mt-2" style="margin-bottom:100px;">
+            
+            {{-- =================================================================== --}}
+            {{-- ================ TABEL HISTORI DENGAN BADGE (MOD 2) ================ --}}
+            {{-- =================================================================== --}}
             <div class="tab-pane fade show active" id="home" role="tabpanel">
                 <table class="table rekap-table-bulanan">
                     <thead>
                         <tr>
                             <th>Tanggal</th>
                             <th>Hari</th>
-                            <th>Jam Masuk</th>
-                            <th>Jam Pulang</th>
-                            <th>Keterangan</th>
+                            <th>Masuk</th>
+                            <th>Pulang</th>
+                            <th>Detail</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -871,68 +1045,152 @@
                         @while ($hariSaatIni->gte($tanggalAwalLoop))
                             @php
                                 $tanggal = $hariSaatIni->format('Y-m-d');
+                                $dayOfWeek = $hariSaatIni->dayOfWeek; // Get day of week
                                 $presensiHariIni = $tempPresensi->where('tgl_presensi', $tanggal)->first();
                                 
                                 $liburData = $tempHarilibur->where('tanggal_libur', $tanggal)->first();
                                 $isHoliday = !is_null($liburData);
                                 $isWeekend = $hariSaatIni->isSunday();
                                 
+                                // Inisialisasi data detail (Variabel ini sudah ada di kode Anda)
                                 $jamMasuk = '-';
                                 $jamPulang = '-';
                                 $keterangan = '';
-                                
+                                $jamHadirHariIni = 0; // Jam didapat (decimal)
+                                $jamSeharusnyaHariIni = 0; // Jam standar (decimal)
+
                                 if ($isWeekend) {
                                     $keterangan = 'Libur';
+                                    $jamSeharusnyaHariIni = 0; // Libur
                                 } elseif ($isHoliday) {
                                     $keterangan = $liburData->keterangan ?? 'Libur Nasional';
-                                } elseif ($presensiHariIni) {
-                                    $jamMasuk = $presensiHariIni->jam_in ?? '-';
-                                    $jamPulang = $presensiHariIni->jam_out ?? '-';
-                                    
-                                    if ($presensiHariIni->status == 'h') {
-                                        if ($presensiHariIni->jam_in > $jamMasukKantor) {
-                                            $keterangan = 'Terlambat';
-                                        } else {
-                                            $keterangan = 'Tepat Waktu';
-                                        }
-                                        
-                                        if ($presensiHariIni->jam_in && !$presensiHariIni->jam_out && $hariSaatIni->isToday()) {
-                                            $keterangan = 'Belum Absen Pulang';
-                                        } elseif ($presensiHariIni->jam_in && !$presensiHariIni->jam_out && !$hariSaatIni->isToday()) {
-                                            $keterangan = 'Lupa Absen Pulang'; // Mengganti dengan Lupa untuk hari lampau
-                                        }
-                                        
-                                    } elseif ($presensiHariIni->status == 'i') {
-                                        $keterangan = 'Izin';
-                                    } elseif ($presensiHariIni->status == 's') {
-                                        $keterangan = 'Sakit';
-                                    } elseif ($presensiHariIni->status == 'c') {
-                                        $keterangan = 'Cuti';
-                                    } elseif ($presensiHariIni->status == 'd') { // BARU: Dinas Luar
-                                        $keterangan = 'Dinas Luar';
-                                    }
+                                    $jamSeharusnyaHariIni = 0; // Libur
                                 } else {
-                                    if (!$isWeekend && !$isHoliday) {
+                                    $jamSeharusnyaHariIni = $jamKerjaHarian[$dayOfWeek] ?? 0;
+
+                                    if ($presensiHariIni) {
+                                        $jamMasuk = $presensiHariIni->jam_in ?? '-';
+                                        $jamPulang = $presensiHariIni->jam_out ?? '-';
+                                        
+                                        if ($presensiHariIni->status == 'h') {
+                                            if ($presensiHariIni->jam_in > $jamMasukKantor) {
+                                                $keterangan = 'Terlambat';
+                                            } else {
+                                                $keterangan = 'Tepat Waktu';
+                                            }
+                                            
+                                            if ($presensiHariIni->jam_in && $presensiHariIni->jam_out) {
+                                                $jamIn = Carbon::parse($presensiHariIni->jam_in);
+                                                $jamOut = Carbon::parse($presensiHariIni->jam_out);
+                                                $durasiMenit = $jamOut->diffInMinutes($jamIn);
+                                                
+                                                if ($hariSaatIni->dayOfWeek == Carbon::FRIDAY) {
+                                                    $breakStart = Carbon::parse($tanggal . ' 12:00:00');
+                                                    $breakEnd = Carbon::parse($tanggal . ' 14:00:00');
+                                                    if ($jamIn->lte($breakStart) && $jamOut->gte($breakEnd)) {
+                                                        $durasiMenit -= 120;
+                                                    }
+                                                }
+                                                $jamHadirHariIni = $durasiMenit / 60;
+
+                                            } elseif ($presensiHariIni->jam_in && !$presensiHariIni->jam_out) {
+                                                $jamHadirHariIni = $jamSeharusnyaHariIni / 2;
+                                                if ($hariSaatIni->isToday()) {
+                                                    $keterangan = 'Belum Absen Pulang';
+                                                } else {
+                                                    $keterangan = 'Lupa Absen Pulang';
+                                                }
+                                            }
+                                        } elseif ($presensiHariIni->status == 'i') {
+                                            $keterangan = 'Izin';
+                                            $jamHadirHariIni = 0;
+                                        } elseif ($presensiHariIni->status == 's') {
+                                            $keterangan = 'Sakit';
+                                            $jamHadirHariIni = 0;
+                                        } elseif ($presensiHariIni->status == 'c') {
+                                            $keterangan = 'Cuti';
+                                            $jamHadirHariIni = 0;
+                                        } elseif ($presensiHariIni->status == 'd') {
+                                            $keterangan = 'Dinas Luar';
+                                            $jamHadirHariIni = $jamSeharusnyaHariIni;
+                                        }
+                                    } else {
                                         $keterangan = 'Alpa';
+                                        $jamHadirHariIni = 0;
                                     }
                                 }
+
+                                $formatJamHadir = sprintf('%02d', floor($jamHadirHariIni)) . ' Jam ' . sprintf('%02d', round(($jamHadirHariIni - floor($jamHadirHariIni)) * 60)) . ' Menit';
+                                $formatJamStandar = sprintf('%02d', floor($jamSeharusnyaHariIni)) . ' Jam ' . sprintf('%02d', round(($jamSeharusnyaHariIni - floor($jamSeharusnyaHariIni)) * 60)) . ' Menit';
                             @endphp
+                            
+                            
                             <tr class="{{ $isWeekend || $isHoliday ? 'table-secondary' : '' }}">
-                                <td>{{ $hariSaatIni->format('d-M-y') }}</td>
+                                <td>{{ $hariSaatIni->format('d M') }}</td>
                                 <td>{{ $hariSaatIni->locale('id')->isoFormat('dddd') }}</td>
-                                <td>{{ $jamMasuk }}</td>
-                                <td>{{ $jamPulang }}</td>
-                                <td>
-                                    <span class="badge {{
-                                        ($keterangan == 'Terlambat' || $keterangan == 'Alpa' || str_contains($keterangan, 'Lupa Absen Pulang')) ? 'text-danger' :
-                                        (($keterangan == 'Izin' || $keterangan == 'Sakit' || $keterangan == 'Cuti' || $keterangan == 'Belum Absen Pulang') ? 'text-warning' : 
-                                        ($keterangan == 'Dinas Luar' ? 'text-success' : // Dinas Luar dianggap OK
-                                        (($isWeekend || $isHoliday) ? 'text-info' : 'text-success')))
-                                    }}">
+                                
+                                @if ($isWeekend || $isHoliday)
+                                    {{-- Hari Libur / Minggu --}}
+                                    <td colspan="2" style="font-weight: 500; color: #6c757d;">
                                         {{ $keterangan }}
-                                    </span>
+                                    </td>
+                                @elseif ($keterangan == 'Izin' || $keterangan == 'Sakit' || $keterangan == 'Cuti' || $keterangan == 'Dinas Luar' || $keterangan == 'Alpa')
+                                    {{-- Izin / Sakit / Cuti / Dinas Luar / Alpa (Status Sehari Penuh) --}}
+                                    <td colspan="2">
+                                        @php
+                                            $badgeClass = 'bg-secondary'; // Default
+                                            if ($keterangan == 'Izin') $badgeClass = 'bg-primary';
+                                            if ($keterangan == 'Sakit') $badgeClass = 'bg-warning text-dark';
+                                            if ($keterangan == 'Cuti') $badgeClass = 'bg-info';
+                                            if ($keterangan == 'Dinas Luar') $badgeClass = 'bg-success';
+                                            if ($keterangan == 'Alpa') $badgeClass = 'bg-danger';
+                                        @endphp
+                                        <span class="badge {{ $badgeClass }}" style="font-size: 0.8rem;">{{ $keterangan }}</span>
+                                    </td>
+                                @else
+                                    {{-- Status Hadir (Tepat Waktu, Terlambat, Lupa Absen) --}}
+                                    
+                                    {{-- Kolom Masuk --}}
+                                    <td>
+                                        @if ($jamMasuk != '-')
+                                            <span class="badge {{ $keterangan == 'Terlambat' ? 'bg-danger' : 'bg-success' }}" style="font-size: 0.8rem;">
+                                                {{ $jamMasuk }}
+                                            </span>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                    
+                                    {{-- Kolom Pulang --}}
+                                    <td>
+                                        @if ($jamPulang != '-')
+                                            <span class="badge bg-success" style="font-size: 0.8rem;">
+                                                {{ $jamPulang }}
+                                            </span>
+                                        @elseif ($keterangan == 'Lupa Absen Pulang' || $keterangan == 'Belum Absen Pulang')
+                                            <span class="badge bg-warning text-dark" style="font-size: 0.8rem;">
+                                                {{ $keterangan == 'Belum Absen Pulang' ? '?' : 'Lupa' }}
+                                            </span>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                @endif
+                                
+                                {{-- Kolom Detail (Tombol Mata) --}}
+                                <td>
+                                    <button class="btn btn-primary btn-sm btn-show-detail"
+                                            data-tanggal="{{ $hariSaatIni->locale('id')->isoFormat('dddd, D MMM Y') }}"
+                                            data-status="{{ $keterangan }}"
+                                            data-jam-masuk="{{ $jamMasuk }}"
+                                            data-jam-pulang="{{ $jamPulang }}"
+                                            data-jam-hadir="{{ $formatJamHadir }}"
+                                            data-jam-standar="{{ $formatJamStandar }}">
+                                        <ion-icon name="eye-outline" style="font-size: 1.1rem; vertical-align: middle;"></ion-icon>
+                                    </button>
                                 </td>
                             </tr>
+
                             @php
                                 $hariSaatIni->subDay();
                             @endphp
@@ -940,67 +1198,127 @@
                     </tbody>
                 </table>
             </div>
+            {{-- =================================================================== --}}
+            {{-- =================== AKHIR TABEL HISTORI (MOD 2) =================== --}}
+            {{-- =================================================================== --}}
 
+
+            {{-- =================================================================== --}}
+            {{-- ================ LEADERBOARD BARU (MOD 3) ========================= --}}
+            {{-- =================================================================== --}}
             <div class="tab-pane fade" id="profile" role="tabpanel">
-    {{-- Memastikan $leaderboard ada dan merupakan array --}}
-    @if(isset($leaderboard) && is_array($leaderboard) || isset($leaderboard) && $leaderboard instanceof \Illuminate\Support\Collection)
-    <ul class="listview image-listview">
-        @foreach ($leaderboard as $d)
-            <li>
-                <div class="item">
+                @if(isset($leaderboard) && ($leaderboard instanceof \Illuminate\Support\Collection || is_array($leaderboard)))
+                    
                     @php
-                        $fotoInPath = !empty($d->foto_in) ? Storage::url('uploads/absensi/' . $d->foto_in) : asset('assets/img/sample/avatar/avatar1.jpg');
-                        $fotoKaryawanPath = !empty($d->foto) ? Storage::url('uploads/karyawan/' . $d->foto) : asset('assets/img/sample/avatar/avatar1.jpg');
+                        // Pastikan $leaderboard adalah Collection untuk menggunakan metode where/whereIn
+                        $leaderboard = collect($leaderboard);
                         
-                        // Tentukan status kehadiran untuk Leaderboard
-                        $statusPresensi = $d->status ?? 'h'; // Asumsi default 'h' jika tidak ada status
-                        $keteranganLeaderboard = '';
-                        $classBadge = 'bg-secondary';
-
-                        if ($statusPresensi == 'i') {
-                            $keteranganLeaderboard = 'Izin';
-                            $classBadge = 'bg-info'; 
-                        } elseif ($statusPresensi == 's') {
-                            $keteranganLeaderboard = 'Sakit';
-                            $classBadge = 'bg-warning';
-                        } elseif ($statusPresensi == 'c') {
-                            $keteranganLeaderboard = 'Cuti';
-                            $classBadge = 'bg-primary';
-                        } elseif ($statusPresensi == 'd') { // BARU: Dinas Luar
-                            $keteranganLeaderboard = 'Dinas Luar';
-                            $classBadge = 'bg-success';
-                        } else {
-                            // Status Hadir ('h')
-                            $keteranganLeaderboard = $d->jam_in ?? 'Belum Absen';
-                            
-                            // Logika untuk Terlambat/Tepat Waktu
-                            if ($d->jam_in) {
-                                $classBadge = $d->jam_in < $jamMasukKantor ? 'bg-success' : 'bg-danger';
-                            } else {
-                                $classBadge = 'bg-secondary';
-                            }
-                        }
+                        // Pisahkan data: 'h' (hadir) untuk leaderboard, sisanya untuk status
+                        // Asumsi controller sudah mengurutkan berdasarkan jam_in ASC
+                        $leaderboardHadir = $leaderboard->where('status', 'h');
+                        $leaderboardLainnya = $leaderboard->whereIn('status', ['i', 's', 'c', 'd', null]);
                     @endphp
-                    <img src="{{ url($fotoKaryawanPath) }}" alt="image" class="image avatar-leaderboard" data-fotoin="{{ url($fotoInPath) }}">
-                    <div class="in">
-                        <div>
-                            <b>{{ $d->nama_lengkap }}</b><br>
-                            <small class="text-muted">{{ $d->jabatan }}</small>
-                        </div>
-                        
-                        {{-- Ganti bagian ini dengan logika yang baru --}}
-                        <span class="badge {{ $classBadge }}">
-                            {{ $keteranganLeaderboard }}
-                        </span>
-                    </div>
-                </div>
-            </li>
-        @endforeach
-    </ul>
-    @else
-        <p class="text-center mt-4">Data Leaderboard tidak tersedia.</p>
-    @endif
-</div>
+
+                    {{-- ================================== --}}
+                    {{-- == BAGIAN 1: LEADERBOARD HADIR == --}}
+                    {{-- ================================== --}}
+                    <ul class="listview image-listview">
+                        @forelse ($leaderboardHadir as $d)
+                            @php
+                                $rank = $loop->iteration;
+                                $rankClass = ($rank <= 3) ? 'rank-' . $rank : 'rank-other';
+                                
+                                $fotoKaryawanPath = !empty($d->foto) ? Storage::url('uploads/karyawan/' . $d->foto) : asset('assets/img/sample/avatar/avatar1.jpg');
+                                $fotoInPath = !empty($d->foto_in) ? Storage::url('uploads/absensi/' . $d->foto_in) : $fotoKaryawanPath; // Fallback jika tidak ada foto absen
+                            
+                                // Badge untuk jam masuk
+                                $classBadge = $d->jam_in < $jamMasukKantor ? 'bg-success' : 'bg-danger';
+                            @endphp
+                            
+                            <li class="leaderboard-item {{ $rankClass }}">
+                                <div class="item">
+                                    {{-- Icon Peringkat (Baru) --}}
+                                    <div class="rank-icon">
+                                        {{ $rank }}
+                                    </div>
+
+                                    {{-- Foto Avatar (Klik untuk lihat foto absen) --}}
+                                    <img src="{{ url($fotoKaryawanPath) }}" alt="image" class="image avatar-leaderboard" data-fotoin="{{ url($fotoInPath) }}">
+                                    
+                                    <div class="in">
+                                        <div>
+                                            <b>{{ $d->nama_lengkap }}</b><br>
+                                            <small class="text-muted">{{ $d->jabatan }}</small>
+                                        </div>
+                                        
+                                        {{-- Badge Jam Masuk --}}
+                                        <span class="badge {{ $classBadge }}">
+                                            {{ $d->jam_in }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                        @empty
+                            <li class="text-center p-3">Belum ada yang hadir hari ini.</li>
+                        @endforelse
+                    </ul>
+
+                    {{-- ================================== --}}
+                    {{-- == BAGIAN 2: STATUS LAINNYA == --}}
+                    {{-- ================================== --}}
+                    @if($leaderboardLainnya->isNotEmpty())
+                        <div class="list-divider">Status Lainnya</div>
+                        <ul class="listview image-listview">
+                            @foreach ($leaderboardLainnya as $d)
+                                @php
+                                    $fotoKaryawanPath = !empty($d->foto) ? Storage::url('uploads/karyawan/' . $d->foto) : asset('assets/img/sample/avatar/avatar1.jpg');
+
+                                    // Logika Badge Status Lainnya
+                                    $statusPresensi = $d->status;
+                                    $keteranganLeaderboard = 'Belum Absen';
+                                    $classBadge = 'bg-secondary'; // Default (Belum Absen / null)
+
+                                    if ($statusPresensi == 'i') {
+                                        $keteranganLeaderboard = 'Izin';
+                                        $classBadge = 'bg-info'; 
+                                    } elseif ($statusPresensi == 's') {
+                                        $keteranganLeaderboard = 'Sakit';
+                                        $classBadge = 'bg-warning text-dark';
+                                    } elseif ($statusPresensi == 'c') {
+                                        $keteranganLeaderboard = 'Cuti';
+                                        $classBadge = 'bg-primary';
+                                    } elseif ($statusPresensi == 'd') {
+                                        $keteranganLeaderboard = 'Dinas Luar';
+                                        $classBadge = 'bg-success';
+                                    }
+                                @endphp
+                                <li>
+                                    <div class="item">
+                                        {{-- Foto dibuat sedikit transparan karena tidak 'hadir' --}}
+                                        <img src="{{ url($fotoKaryawanPath) }}" alt="image" class="image avatar-leaderboard" style="opacity: 0.7;">
+                                        <div class="in">
+                                            <div>
+                                                <b>{{ $d->nama_lengkap }}</b><br>
+                                                <small class="text-muted">{{ $d->jabatan }}</small>
+                                            </div>
+                                            <span class="badge {{ $classBadge }}">
+                                                {{ $keteranganLeaderboard }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+
+                @else
+                    <p class="text-center mt-4">Data Leaderboard tidak tersedia.</p>
+                @endif
+            </div>
+            {{-- =================================================================== --}}
+            {{-- ===================== AKHIR LEADERBOARD (MOD 3) =================== --}}
+            {{-- =================================================================== --}}
+            
         </div>
     </div>
 </div>
@@ -1024,40 +1342,263 @@
 
 </div>
 
+{{-- MODAL UNTUK DETAIL KETERANGAN HARIAN --}}
+<div id="detailKeteranganModal" class="modal">
+    <div class="modal-content-container" style="max-width: 400px; margin-top: 20vh; border-radius: 12px;">
+        
+        <span class="close close-detail" style="top: 10px; right: 20px; font-size: 30px;">&times;</span>
+
+        <div class="modal-header">
+            <h4 id="detailModalTitle" style="text-align: center; width: 100%;">Detail Keterangan</h4>
+        </div>
+        
+        {{-- Body Modal dengan Struktur List --}}
+        <div class="modal-body" id="detailModalBody" style="padding: 15px;">
+            <ul class="list-group list-group-flush" style="font-size: 0.95rem;">
+                <li class="list-group-item d-flex justify-content-between align-items: center">
+                    Status
+                    <span id="detail-status" class="badge" style="font-size: 0.95rem;"></span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items: center">
+                    Jam Masuk
+                    <strong id="detail-jam-masuk"></strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items: center">
+                    Jam Pulang
+                    <strong id="detail-jam-pulang"></strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items: center">
+                    Jam Hadir (Didapat)
+                    <strong id="detail-jam-hadir"></strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items: center">
+                    Jam Kerja (Standar)
+                    <strong id="detail-jam-standar"></strong>
+                </li>
+            </ul>
+        </div>
+        
+    </div>
+</div>
+
+{{-- =================================================================== --}}
+{{-- ================ MODAL REKAP STATUS (DESAIN PROFESIONAL BARU) ================ --}}
+{{-- =================================================================== --}}
+<div id="rekapStatusModal" class="modal">
+    <div class="modal-content-container" style="max-width: 450px; margin-top: 20vh; border-radius: 12px;">
+        
+        <span class="close close-rekap" style="top: 10px; right: 20px; font-size: 30px;">&times;</span>
+
+        <div class="modal-header">
+            <h4 style="text-align: center; width: 100%;">Rekap Status Bulan Ini</h4>
+        </div>
+        
+        <div class="modal-body" style="padding: 15px 10px;">
+            <ul class="list-group list-group-flush" style="font-size: 1rem;">
+                
+                <li class="list-group-item d-flex justify-content-between align-items: center">
+                    <strong>Total Hari Kerja (s/d Hari Ini)</strong>
+                    <span class="badge bg-dark rounded-pill" style="font-size: 1rem;">{{ $totalHariKerjaEfektif }} Hari</span>
+                </li>
+                
+                {{-- Kategori Kehadiran --}}
+                <li class="list-group-item d-flex justify-content-between align-items: center">
+                    <span class="text-success-new"><ion-icon name="checkmark-circle-outline" style="vertical-align: -2px; margin-right: 5px;"></ion-icon>Hadir</span>
+                    <span class="badge bg-success rounded-pill">{{ $hadirBulanan }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items: center">
+                    <span class="text-success"><ion-icon name="briefcase-outline" style="vertical-align: -2px; margin-right: 5px;"></ion-icon>Dinas Luar</span>
+                    <span class="badge bg-success rounded-pill">{{ $dinasLuarBulanan }}</span>
+                </li>
+                
+                {{-- Kategori Izin/Sakit --}}
+                <li class="list-group-item d-flex justify-content-between align-items: center">
+                    <span class="text-warning-new"><ion-icon name="medkit-outline" style="vertical-align: -2px; margin-right: 5px;"></ion-icon>Sakit</span>
+                    <span class="badge bg-warning rounded-pill text-dark">{{ $sakitBulanan }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items: center">
+                    <span class="text-primary-new"><ion-icon name="mail-outline" style="vertical-align: -2px; margin-right: 5px;"></ion-icon>Izin</span>
+                    <span class="badge bg-primary rounded-pill">{{ $izinBulanan }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items: center">
+                    <span class="text-info-new"><ion-icon name="today-outline" style="vertical-align: -2px; margin-right: 5px;"></ion-icon>Cuti</span>
+                    <span class="badge bg-info rounded-pill">{{ $cutiBulanan }}</span>
+                </li>
+                
+                {{-- Kategori Alpa --}}
+                <li class="list-group-item d-flex justify-content-between align-items: center">
+                    <span class="text-danger"><ion-icon name="close-circle-outline" style="vertical-align: -2px; margin-right: 5px;"></ion-icon>Alpa</span>
+                    <span class="badge bg-danger rounded-pill">{{ $alpaBulanan }}</span>
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+</div>
+{{-- =================================================================== --}}
+{{-- =================== AKHIR MODAL REKAP STATUS BARU =================== --}}
+{{-- =================================================================== --}}
+
+
 @endsection
 
+{{-- JAVASCRIPT GABUNGAN UNTUK SEMUA (3) MODAL --}}
 @push('myscript')
-{{-- (Kode Javascript tetap sama seperti milik Anda) --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // --- MODAL 1: FOTO LEADERBOARD ---
         var modal = document.getElementById("myModal");
         var modalImg = document.getElementById("img01");
-        var closeBtn = document.getElementsByClassName("close")[0];
+        var closeBtn = document.getElementsByClassName("close")[0]; // Ambil tombol close pertama (untuk modal foto)
 
-        var images = document.querySelectorAll('.avatar-leaderboard');
-        images.forEach(function(img) {
-            img.onclick = function() {
-                var fotoInUrl = this.getAttribute('data-fotoin');
+        // Delegasi event ke body untuk menangani klik pada avatar leaderboard
+        document.body.addEventListener('click', function(event) {
+            if (event.target && event.target.classList.contains('avatar-leaderboard')) {
+                var fotoInUrl = event.target.getAttribute('data-fotoin');
                 
-                // Cek apakah URL mengarah ke foto absensi
-                if (fotoInUrl && fotoInUrl.includes('uploads/absensi')) { 
+                if (fotoInUrl && (fotoInUrl.includes('uploads/absensi') || fotoInUrl.includes('uploads/karyawan'))) { 
                     modal.style.display = "block"; 
                     modalImg.src = fotoInUrl;
                 } else {
-                    // MODIFIKASI: Menghilangkan alert() dan menggantinya dengan console.log
-                    // Di sisi pengguna, tidak ada yang akan muncul.
                     console.log('Foto presensi masuk tidak tersedia. Tidak ada tindakan pop-up.');
                 }
             }
         });
 
-        closeBtn.onclick = function() {
-            modal.style.display = "none";
+
+        if(closeBtn) {
+            closeBtn.onclick = function() {
+                modal.style.display = "none";
+            }
         }
 
+        // --- MODAL 2: DETAIL KETERANGAN HARIAN ---
+        var detailModal = document.getElementById("detailKeteranganModal");
+        var modalTitle = document.getElementById("detailModalTitle");
+        var detailStatus = document.getElementById("detail-status");
+        var detailJamMasuk = document.getElementById("detail-jam-masuk");
+        var detailJamPulang = document.getElementById("detail-jam-pulang");
+        var detailJamHadir = document.getElementById("detail-jam-hadir");
+        var detailJamStandar = document.getElementById("detail-jam-standar");
+        var detailCloseBtn = detailModal.querySelector(".close-detail"); 
+        
+        // Delegasi event ke body untuk tombol detail
+        document.body.addEventListener('click', function(event) {
+            var btn = event.target.closest('.btn-show-detail');
+            if (btn) {
+                var tanggal = btn.getAttribute('data-tanggal');
+                var status = btn.getAttribute('data-status');
+                var jamMasuk = btn.getAttribute('data-jam-masuk');
+                var jamPulang = btn.getAttribute('data-jam-pulang');
+                var jamHadir = btn.getAttribute('data-jam-hadir');
+                var jamStandar = btn.getAttribute('data-jam-standar');
+
+                modalTitle.textContent = tanggal;
+                detailStatus.textContent = status;
+                detailJamMasuk.textContent = jamMasuk;
+                detailJamPulang.textContent = jamPulang;
+                detailJamHadir.textContent = jamHadir;
+                detailJamStandar.textContent = jamStandar;
+
+                detailStatus.className = 'badge';
+                if (status == 'Tepat Waktu' || status == 'Dinas Luar') {
+                    detailStatus.classList.add('bg-success');
+                } else if (status == 'Terlambat' || status == 'Alpa' || status == 'Lupa Absen Pulang') {
+                    detailStatus.classList.add('bg-danger');
+                } else if (status == 'Libur' || status == 'Libur Nasional') {
+                    detailStatus.classList.add('bg-info');
+                } else {
+                    detailStatus.classList.add('bg-warning', 'text-dark');
+                }
+                
+                detailModal.style.display = "block";
+            }
+        });
+
+        if(detailCloseBtn) {
+            detailCloseBtn.onclick = function() {
+                detailModal.style.display = "none";
+            }
+        }
+
+        // --- MODAL 3: REKAP STATUS BULANAN (BARU) ---
+        var rekapStatusModal = document.getElementById("rekapStatusModal");
+        var btnShowRekapStatus = document.getElementById("btnShowRekapStatus");
+        var rekapCloseBtn = rekapStatusModal.querySelector(".close-rekap");
+
+        if (btnShowRekapStatus) {
+            btnShowRekapStatus.onclick = function() {
+                rekapStatusModal.style.display = "block";
+            }
+        }
+        if (rekapCloseBtn) {
+            rekapCloseBtn.onclick = function() {
+                rekapStatusModal.style.display = "none";
+            }
+        }
+
+
+        // --- FUNGSI TUTUP SEMUA MODAL JIKA KLIK DI LUAR ---
         window.onclick = function(event) {
             if (event.target == modal) {
                 modal.style.display = "none";
+            }
+            if (event.target == detailModal) {
+                detailModal.style.display = "none";
+            }
+            if (event.target == rekapStatusModal) {
+                rekapStatusModal.style.display = "none";
+            }
+        }
+        
+        // --- Jaga Tab Aktif (Penting setelah mengganti konten tab) ---
+        // Script ini memastikan jika user ada di tab Leaderboard,
+        // halaman tetap di tab Leaderboard saat modal ditutup.
+        var tabLinks = document.querySelectorAll('.nav-tabs .nav-link');
+        tabLinks.forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Simpan tab yang aktif
+                localStorage.setItem('activeTab', this.getAttribute('href'));
+                
+                // Tampilkan tab (Bootstrap 4/5 JS)
+                if(typeof(bootstrap) !== 'undefined') {
+                    var tab = new bootstrap.Tab(this);
+                    tab.show();
+                } else if(typeof($) !== 'undefined') {
+                    $(this).tab('show');
+                } else {
+                    // Fallback manual jika tidak ada JS framework
+                    var targetId = this.getAttribute('href');
+                    document.querySelectorAll('.tab-pane').forEach(function(pane) {
+                        pane.classList.remove('show', 'active');
+                    });
+                    document.querySelector(targetId).classList.add('show', 'active');
+                    
+                    document.querySelectorAll('.nav-link').forEach(function(nav) {
+                        nav.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Saat halaman dimuat, cek tab yang tersimpan
+        var activeTab = localStorage.getItem('activeTab');
+        if (activeTab) {
+            var activeLink = document.querySelector('.nav-tabs .nav-link[href="' + activeTab + '"]');
+            if(activeLink) {
+                // Hapus 'active' dan 'show' dari default
+                var defaultActiveLink = document.querySelector('.nav-tabs .nav-link.active');
+                var defaultActivePane = document.querySelector('.tab-pane.fade.show.active');
+                
+                if(defaultActiveLink) defaultActiveLink.classList.remove('active');
+                if(defaultActivePane) defaultActivePane.classList.remove('show', 'active');
+                
+                // Tambahkan ke yang tersimpan
+                activeLink.classList.add('active');
+                var targetPane = document.querySelector(activeTab);
+                if(targetPane) targetPane.classList.add('show', 'active');
             }
         }
     });
